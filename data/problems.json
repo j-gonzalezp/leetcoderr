@@ -1,0 +1,530 @@
+[
+    {
+        "id": "two-sum",
+        "title": "001. Two Sum",
+        "difficulty": "Easy",
+        "description": "Dada una matriz de enteros `nums` y un entero `target`, devuelve los índices de los dos números tales que sumen `target`. Se asume que existe exactamente una solución y no puedes usar el mismo elemento dos veces.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Fuerza Bruta (N^2)",
+                "explanation": "Esta es la aproximación más directa. Consiste en iterar sobre cada elemento de la matriz y, para cada uno, iterar nuevamente sobre el resto de los elementos para ver si la suma de ambos es igual al `target`. Es ineficiente para arrays grandes, ya que requiere dos bucles anidados.",
+                "code_snippet": "function twoSum(nums, target) {\n    for (let i = 0; i < nums.length; i++) {\n        for (let j = i + 1; j < nums.length; j++) {\n            if (nums[i] + nums[j] === target) {\n                return [i, j];\n            }\n        }\n    }\n    return [];\n}",
+                "complexity": "Time: O(N^2), Space: O(1)",
+                "example": "Input: [2, 7, 11, 15], 9\nOutput: [0, 1]"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Hash Map (Optimización O(N))",
+                "explanation": "La clave para optimizar a O(N) es evitar el segundo bucle. En su lugar, calculamos el 'complemento' (`target - nums[i]`) y verificamos si ese complemento ya ha sido visto. Usamos un mapa (o hash table) para almacenar los números vistos y sus índices, lo que permite búsquedas en tiempo promedio O(1).",
+                "code_snippet": "function twoSum(nums, target) {\n    const map = new Map();\n    for (let i = 0; i < nums.length; i++) {\n        const complement = target - nums[i];\n        if (map.has(complement)) {\n            // El complemento ya fue visto, devolvemos su índice y el índice actual (i)\n            return [map.get(complement), i];\n        }\n        // Si no se encuentra, almacenamos el número actual y su índice para futuras búsquedas\n        map.set(nums[i], i);\n    }\n    return [];\n}",
+                "complexity": "Time: O(N), Space: O(N)",
+                "example": "Input: [2, 7, 11, 15], 9\nOutput: [0, 1]"
+            }
+        ]
+    },
+    {
+        "id": "add-two-numbers",
+        "title": "002. Add Two Numbers",
+        "difficulty": "Medium",
+        "description": "Se te dan dos listas enlazadas no vacías que representan dos números enteros no negativos. Los dígitos se almacenan en orden inverso, y cada uno de sus nodos contiene un solo dígito. Suma los dos números y devuelve la suma como una lista enlazada.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Iteración con 'Carry'",
+                "explanation": "Simulamos la suma que haríamos manualmente, dígito por dígito, empezando por el nodo de la cabeza (unidades). Usamos una variable `carry` para rastrear si la suma de los dígitos excede 9 (llevando 1 a la siguiente posición). El proceso continúa hasta que ambas listas se agotan y no queda `carry`.",
+                "code_snippet": "function addTwoNumbers(l1, l2) {\n    let dummyHead = new ListNode(0);\n    let current = dummyHead;\n    let carry = 0;\n    \n    while (l1 !== null || l2 !== null || carry !== 0) {\n        const val1 = l1 ? l1.val : 0;\n        const val2 = l2 ? l2.val : 0;\n        \n        const sum = val1 + val2 + carry;\n        carry = Math.floor(sum / 10); // Nuevo acarreo (0 o 1)\n        const digit = sum % 10;        // El dígito actual\n        \n        current.next = new ListNode(digit);\n        current = current.next;\n        \n        if (l1) l1 = l1.next;\n        if (l2) l2 = l2.next;\n    }\n    \n    return dummyHead.next;\n}",
+                "complexity": "Time: O(max(L1, L2)), Space: O(max(L1, L2))",
+                "example": "Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)\nOutput: 7 -> 0 -> 8"
+            }
+        ]
+    },
+    {
+        "id": "longest-substring-without-repeating-characters",
+        "title": "003. Longest Substring Without Repeating Characters",
+        "difficulty": "Medium",
+        "description": "Dada una cadena `s`, encuentra la longitud de la subcadena más larga sin caracteres repetidos.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Sliding Window (Ventana Deslizante)",
+                "explanation": "Usamos una 'ventana deslizante' definida por dos punteros, `left` y `right`, para mantener la subcadena actual sin repeticiones. Utilizamos un conjunto (`Set` o `Map`) para rastrear los caracteres dentro de la ventana. Si encontramos un duplicado en `s[right]`, movemos el puntero `left` hacia la derecha, eliminando caracteres del conjunto, hasta que el duplicado se elimine de la ventana. En cada paso, actualizamos la longitud máxima.",
+                "code_snippet": "function lengthOfLongestSubstring(s) {\n    let set = new Set();\n    let left = 0;\n    let maxLength = 0;\n    \n    for (let right = 0; right < s.length; right++) {\n        // Si el caracter ya existe en el set, encoge la ventana desde la izquierda\n        while (set.has(s[right])) {\n            set.delete(s[left]);\n            left++;\n        }\n        // Agrega el nuevo caracter y expande la ventana hacia la derecha\n        set.add(s[right]);\n        // Actualiza la longitud máxima de la ventana (right - left + 1)\n        maxLength = Math.max(maxLength, right - left + 1);\n    }\n    return maxLength;\n}",
+                "complexity": "Time: O(N), Space: O(min(N, AlphabetSize))",
+                "example": "Input: \"abcabcbb\"\nOutput: 3 (Subcadena: \"abc\")"
+            }
+        ]
+    },
+    {
+        "id": "valid-parentheses",
+        "title": "020. Valid Parentheses",
+        "difficulty": "Easy",
+        "description": "Dada una cadena que contiene solo los caracteres '(', ')', '{', '}', '[' y ']', determina si la cadena de entrada es válida. Una cadena es válida si los paréntesis de apertura deben cerrarse con el mismo tipo de paréntesis y en el orden correcto.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Stack (Pila)",
+                "explanation": "Este problema es un caso clásico de uso de pilas. Cuando encontramos un paréntesis de apertura ('(', '{', '['), lo empujamos a la pila. Cuando encontramos uno de cierre, verificamos si la pila está vacía o si el elemento superior de la pila es su par de apertura correspondiente. Si no coinciden, la cadena es inválida. Al finalizar, la pila debe estar vacía para que todos los abridores hayan sido cerrados.",
+                "code_snippet": "function isValid(s) {\n    const stack = [];\n    const map = {\n        ')': '(',\n        '}': '{',\n        ']': '['\n    };\n    for (const char of s) {\n        // Si es un caracter de cierre\n        if (char in map) {\n            // 1. La pila está vacía O 2. El último elemento no es el par coincidente\n            if (stack.length === 0 || stack.pop() !== map[char]) {\n                return false;\n            }\n        } else {\n            // Si es un caracter de apertura, lo agregamos a la pila\n            stack.push(char);\n        }\n    }\n    // Si la pila está vacía, todos los paréntesis se cerraron correctamente\n    return stack.length === 0;\n}",
+                "complexity": "Time: O(N), Space: O(N)",
+                "example": "Input: \"([{}])\"\nOutput: true"
+            }
+        ]
+    },
+    {
+        "id": "merge-two-sorted-lists",
+        "title": "021. Merge Two Sorted Lists",
+        "difficulty": "Easy",
+        "description": "Combina dos listas enlazadas ordenadas en una sola lista enlazada ordenada. La nueva lista debería crearse empalmando los nodos de las dos listas originales.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Iterativa con Nodo Dummy",
+                "explanation": "Usamos un 'nodo dummy' como punto de partida para la nueva lista combinada, lo que simplifica la lógica al no tener que manejar un caso especial para la cabeza. Iteramos mientras ambas listas tengan nodos, comparando los valores de los nodos actuales (`l1.val` vs `l2.val`) y adjuntando el menor al final de la lista combinada, avanzando el puntero de esa lista. Una vez que una lista se vacía, adjuntamos los nodos restantes de la otra lista.",
+                "code_snippet": "function mergeTwoLists(l1, l2) {\n    const dummy = new ListNode(0);\n    let current = dummy;\n    \n    while (l1 !== null && l2 !== null) {\n        if (l1.val <= l2.val) {\n            current.next = l1;\n            l1 = l1.next;\n        } else {\n            current.next = l2;\n            l2 = l2.next;\n        }\n        current = current.next;\n    }\n    \n    // Adjuntar los nodos restantes (solo uno de estos será no-nulo)\n    if (l1 !== null) {\n        current.next = l1;\n    } else if (l2 !== null) {\n        current.next = l2;\n    }\n    \n    return dummy.next;\n}",
+                "complexity": "Time: O(L1 + L2), Space: O(1) [sin contar la salida]",
+                "example": "Input: l1 = [1,2,4], l2 = [1,3,4]\nOutput: [1,1,2,3,4,4]"
+            }
+        ]
+    },
+    {
+        "id": "maximum-subarray",
+        "title": "053. Maximum Subarray",
+        "difficulty": "Easy",
+        "description": "Dado un array de enteros `nums`, encuentra la submatriz contigua que tiene la suma más grande y devuelve su suma.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Algoritmo de Kadane",
+                "explanation": "El algoritmo de Kadane es una técnica de programación dinámica eficiente. Mantiene dos variables: `currentMax` (la suma máxima que termina en el índice actual) y `globalMax` (la suma máxima encontrada hasta ahora). En cada paso, la `currentMax` se decide entre empezar una nueva submatriz en el número actual (`nums[i]`) o extender la submatriz anterior (`currentMax + nums[i]`). El `globalMax` simplemente rastrea el valor más alto de `currentMax` visto.",
+                "code_snippet": "function maxSubArray(nums) {\n    if (nums.length === 0) return 0;\n    \n    let currentMax = nums[0];\n    let globalMax = nums[0];\n    \n    for (let i = 1; i < nums.length; i++) {\n        // La nueva suma máxima que termina en 'i' es el número actual\n        // O el número actual sumado a la suma máxima anterior.\n        currentMax = Math.max(nums[i], currentMax + nums[i]);\n        \n        // Actualizar la suma máxima global\n        globalMax = Math.max(globalMax, currentMax);\n    }\n    return globalMax;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: [-2, 1, -3, 4, -1, 2, 1, -5, 4]\nOutput: 6 (Submatriz: [4, -1, 2, 1])"
+            }
+        ]
+    },
+    {
+        "id": "single-number",
+        "title": "136. Single Number",
+        "difficulty": "Easy",
+        "description": "Dada una matriz no vacía de enteros `nums`, cada elemento aparece dos veces excepto uno. Encuentra ese único elemento.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: XOR (Propiedad Exclusiva OR)",
+                "explanation": "Esta es la solución más eficiente y utiliza las propiedades del operador XOR (`^`). La propiedad clave es que $A \\oplus A = 0$ y $A \\oplus 0 = A$. Al aplicar XOR a todos los elementos del array, los pares de números idénticos se cancelan (resultando en 0), y el número único, al hacer XOR con 0, queda como el resultado final.",
+                "code_snippet": "function singleNumber(nums) {\n    let result = 0;\n    for (const num of nums) {\n        result ^= num;\n    }\n    return result;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: [4, 1, 2, 1, 2]\nOutput: 4"
+            }
+        ]
+    },
+    {
+        "id": "move-zeroes",
+        "title": "283. Move Zeroes",
+        "difficulty": "Easy",
+        "description": "Dado un array `nums`, mueve todos los ceros al final de este, mientras mantienes el orden relativo de los elementos no cero. Debes hacerlo *in place* sin hacer una copia del array.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Two Pointers (Puntero de Escritura)",
+                "explanation": "Usamos un puntero (`nonZeroIndex`) para rastrear dónde se debe colocar el siguiente elemento no cero. Recorremos el array con otro puntero (`i`). Si `nums[i]` no es cero, lo colocamos en `nums[nonZeroIndex]` y avanzamos `nonZeroIndex`. Esto garantiza que todos los elementos no cero se muevan al principio en su orden original. Al finalizar el primer bucle, todos los elementos desde `nonZeroIndex` hasta el final son ceros, y simplemente los sobrescribimos con 0.",
+                "code_snippet": "function moveZeroes(nums) {\n    let nonZeroIndex = 0;\n    \n    // Paso 1: Mover todos los no-ceros al frente\n    for (let i = 0; i < nums.length; i++) {\n        if (nums[i] !== 0) {\n            nums[nonZeroIndex] = nums[i];\n            nonZeroIndex++;\n        }\n    }\n    \n    // Paso 2: Llenar el resto del array con ceros\n    for (let i = nonZeroIndex; i < nums.length; i++) {\n        nums[i] = 0;\n    }\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: [0, 1, 0, 3, 12]\nOutput: [1, 3, 12, 0, 0]"
+            }
+        ]
+    },
+    {
+        "id": "reverse-string",
+        "title": "344. Reverse String",
+        "difficulty": "Easy",
+        "description": "Escribe una función que invierta una cadena. La cadena de entrada se da como un array de caracteres `s`. Debes hacerlo *in place* con O(1) de espacio extra.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Two Pointers (Intercambio)",
+                "explanation": "Esta técnica es ideal para operaciones *in place*. Inicializamos dos punteros: `left` al inicio y `right` al final. En cada iteración, intercambiamos los caracteres en las posiciones `left` y `right`, y luego movemos `left` una posición a la derecha y `right` una posición a la izquierda. El proceso se detiene cuando `left` es mayor o igual a `right`.",
+                "code_snippet": "function reverseString(s) {\n    let left = 0;\n    let right = s.length - 1;\n    while (left < right) {\n        // Intercambio\n        [s[left], s[right]] = [s[right], s[left]];\n        left++;\n        right--;\n    }\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: [\"h\",\"e\",\"l\",\"l\",\"o\"]\nOutput: [\"o\",\"l\",\"l\",\"e\",\"h\"]"
+            }
+        ]
+    },
+    {
+        "id": "fizz-buzz",
+        "title": "412. Fizz Buzz",
+        "difficulty": "Easy",
+        "description": "Escribe un programa que imprima los números del 1 al `n`. Para múltiplos de tres, imprime “Fizz”; para múltiplos de cinco, imprime “Buzz”; y para múltiplos de tres y cinco, imprime “FizzBuzz”.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Clásica con Módulo",
+                "explanation": "Iteramos desde 1 hasta `n`. Es crucial verificar primero el caso de divisibilidad por 3 y 5 (es decir, divisibilidad por 15), ya que si verificamos 3 y 5 por separado primero, el caso 'FizzBuzz' nunca se alcanzaría. El operador de módulo (`%`) nos permite determinar la divisibilidad.",
+                "code_snippet": "function fizzBuzz(n) {\n    const result = [];\n    for (let i = 1; i <= n; i++) {\n        let output = \"\";\n        \n        // Caso 1: Múltiplo de 3 y 5 (15)\n        if (i % 3 === 0 && i % 5 === 0) {\n            output = \"FizzBuzz\";\n        // Caso 2: Múltiplo de 3\n        } else if (i % 3 === 0) {\n            output = \"Fizz\";\n        // Caso 3: Múltiplo de 5\n        } else if (i % 5 === 0) {\n            output = \"Buzz\";\n        // Caso 4: Ninguno de los anteriores\n        } else {\n            output = i.toString();\n        }\n        result.push(output);\n    }\n    return result;\n}",
+                "complexity": "Time: O(N), Space: O(N)",
+                "example": "Input: 5\nOutput: [\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\"]"
+            }
+        ]
+    },
+    {
+        "id": "best-time-to-buy-and-sell-stock",
+        "title": "121. Best Time to Buy and Sell Stock",
+        "difficulty": "Easy",
+        "description": "Dado un array `prices` donde `prices[i]` es el precio de una acción en el día `i`. Encuentra la ganancia máxima que puedes lograr al completar una transacción (comprar una y vender una).",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Una Pasada (Min Price Tracking)",
+                "explanation": "Solo necesitamos encontrar el día de compra más bajo *antes* de cada día de venta. Iteramos sobre los precios, manteniendo un registro del precio más bajo visto hasta ahora (`minPrice`). Para el precio actual, calculamos la ganancia potencial (`price - minPrice`) y actualizamos la ganancia máxima global (`maxProfit`) si esta ganancia potencial es mayor. Esto garantiza que la compra siempre ocurra antes de la venta.",
+                "code_snippet": "function maxProfit(prices) {\n    let minPrice = Infinity; // Inicializar con un valor muy grande\n    let maxProfit = 0;\n    \n    for (const price of prices) {\n        // 1. Encontrar el precio más bajo hasta el momento\n        minPrice = Math.min(minPrice, price);\n        \n        // 2. Calcular la ganancia potencial si vendemos hoy\n        const potentialProfit = price - minPrice;\n        \n        // 3. Actualizar la ganancia máxima global\n        maxProfit = Math.max(maxProfit, potentialProfit);\n    }\n    return maxProfit;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: [7, 1, 5, 3, 6, 4]\nOutput: 5 (Comprar en 1, vender en 6)"
+            }
+        ]
+    },
+    {
+        "id": "contains-duplicate",
+        "title": "217. Contains Duplicate",
+        "difficulty": "Easy",
+        "description": "Dado un array de enteros `nums`, devuelve `true` si algún valor aparece al menos dos veces en el array, y `false` si cada elemento es distinto.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Hash Set",
+                "explanation": "La forma más eficiente es usar un Set (conjunto hash) para almacenar los números que ya hemos encontrado. Un Set permite inserciones y verificaciones de existencia en tiempo promedio O(1). Iteramos sobre el array; si el número actual ya está en el Set, devolvemos `true`. De lo contrario, lo agregamos al Set.",
+                "code_snippet": "function containsDuplicate(nums) {\n    const seen = new Set();\n    for (const num of nums) {\n        if (seen.has(num)) {\n            return true; // Duplicado encontrado\n        }\n        seen.add(num);\n    }\n    return false; // No se encontraron duplicados\n}",
+                "complexity": "Time: O(N), Space: O(N)",
+                "example": "Input: [1, 2, 3, 1]\nOutput: true"
+            }
+        ]
+    },
+    {
+        "id": "invert-binary-tree",
+        "title": "226. Invert Binary Tree",
+        "difficulty": "Easy",
+        "description": "Invertir un árbol binario. Es decir, intercambiar los nodos hijos izquierdo y derecho de cada nodo.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Recursión (DFS)",
+                "explanation": "La inversión de un árbol binario se logra recursivamente. Para cualquier nodo, su tarea es simplemente intercambiar sus hijos izquierdo y derecho. Luego, llama a la función de inversión recursivamente en el nuevo subárbol izquierdo (que era el derecho original) y en el nuevo subárbol derecho (que era el izquierdo original). El caso base es cuando el nodo es `null`.",
+                "code_snippet": "function invertTree(root) {\n    if (root === null) {\n        return null;\n    }\n    \n    // Intercambiar los hijos\n    const left = root.left;\n    root.left = root.right;\n    root.right = left;\n    \n    // Invertir recursivamente los subárboles\n    invertTree(root.left);\n    invertTree(root.right);\n    \n    return root;\n}",
+                "complexity": "Time: O(N), Space: O(H) [Altura del árbol]",
+                "example": "Input: [4, 2, 7, 1, 3, 6, 9]\nOutput: [4, 7, 2, 9, 6, 3, 1]"
+            }
+        ]
+    },
+    {
+        "id": "palindrome-number",
+        "title": "009. Palindrome Number",
+        "difficulty": "Easy",
+        "description": "Dado un entero `x`, devuelve `true` si `x` es un palíndromo. Un entero es un palíndromo cuando se lee igual de adelante hacia atrás.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Revertir la Mitad del Número",
+                "explanation": "Para evitar el desbordamiento de enteros que podría ocurrir al revertir el número completo, solo revertimos la mitad del número. Primero, manejamos los casos triviales (números negativos o números terminados en 0). Luego, construimos el número `revertedNumber` con los dígitos de la mitad inferior de `x`. El bucle se detiene cuando `x` es menor o igual a `revertedNumber`. Finalmente, verificamos si `x` es igual a `revertedNumber` (para números de longitud par) o `revertedNumber` dividido por 10 (para números de longitud impar).",
+                "code_snippet": "function isPalindrome(x) {\n    // Caso especial: números negativos o números terminados en 0 (excepto el 0 mismo)\n    if (x < 0 || (x % 10 === 0 && x !== 0)) {\n        return false;\n    }\n    \n    let revertedNumber = 0;\n    while (x > revertedNumber) {\n        revertedNumber = revertedNumber * 10 + (x % 10);\n        x = Math.floor(x / 10);\n    }\n    \n    // Para longitud par: x === revertedNumber\n    // Para longitud impar: x === Math.floor(revertedNumber / 10)\n    return x === revertedNumber || x === Math.floor(revertedNumber / 10);\n}",
+                "complexity": "Time: O(log N), Space: O(1)",
+                "example": "Input: 121\nOutput: true"
+            }
+        ]
+    },
+    {
+        "id": "roman-to-integer",
+        "title": "013. Roman to Integer",
+        "difficulty": "Easy",
+        "description": "Dado un número romano, conviértelo a un entero. Se garantiza que la entrada está en el rango de 1 a 3999.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Iteración con Regla de Sustracción",
+                "explanation": "Los números romanos se leen de izquierda a derecha sumando sus valores, excepto cuando un símbolo de menor valor precede a uno de mayor valor (la regla de sustracción, ej: IV = 4). Utilizamos un mapa para asignar valores. Iteramos de derecha a izquierda o, como en esta solución, de izquierda a derecha. Si el valor del símbolo actual es menor que el valor del siguiente, lo restamos; de lo contrario, lo sumamos.",
+                "code_snippet": "function romanToInt(s) {\n    const map = {\n        'I': 1, 'V': 5, 'X': 10, 'L': 50,\n        'C': 100, 'D': 500, 'M': 1000\n    };\n    \n    let result = 0;\n    \n    for (let i = 0; i < s.length; i++) {\n        const currentVal = map[s[i]];\n        const nextVal = map[s[i + 1]];\n        \n        if (nextVal > currentVal) {\n            // Aplicar la regla de sustracción (ej. IV = 5 - 1)\n            result += (nextVal - currentVal);\n            i++; // Saltar el siguiente símbolo ya que fue procesado\n        } else {\n            result += currentVal;\n        }\n    }\n    return result;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: \"LVIII\"\nOutput: 58"
+            }
+        ]
+    },
+    {
+        "id": "longest-common-prefix",
+        "title": "014. Longest Common Prefix",
+        "difficulty": "Easy",
+        "description": "Escribe una función para encontrar la cadena de prefijo común más larga entre un array de cadenas.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Exploración Horizontal (Horizontal Scanning)",
+                "explanation": "Asumimos inicialmente que el primer string es el prefijo común. Luego, iteramos sobre el resto de las strings, acortando el prefijo común actual si no es un prefijo de la string que estamos examinando. La función `indexOf(prefix) === 0` verifica eficientemente si `prefix` es el prefijo de la string actual. Si el prefijo se acorta a una cadena vacía, no hay prefijo común.",
+                "code_snippet": "function longestCommonPrefix(strs) {\n    if (!strs || strs.length === 0) return \"\";\n    \n    let prefix = strs[0];\n    \n    // Iterar a través de las cadenas restantes\n    for (let i = 1; i < strs.length; i++) {\n        let currentStr = strs[i];\n        \n        // Mientras el prefijo no se encuentre al inicio de currentStr\n        while (currentStr.indexOf(prefix) !== 0) {\n            // Acortar el prefijo en un carácter\n            prefix = prefix.substring(0, prefix.length - 1);\n            \n            // Si el prefijo se vacía, no hay prefijo común\n            if (prefix.length === 0) return \"\";\n        }\n    }\n    \n    return prefix;\n}",
+                "complexity": "Time: O(S), donde S es la suma de todas las longitudes de las strings. En el peor caso, O(N * M), donde N es el número de strings y M es la longitud de la string más corta.",
+                "example": "Input: [\"flower\",\"flow\",\"flight\"]\nOutput: \"fl\""
+            }
+        ]
+    },
+    {
+        "id": "median-of-two-sorted-arrays",
+        "title": "004. Median of Two Sorted Arrays",
+        "difficulty": "Hard",
+        "description": "Dados dos arrays ordenados `nums1` y `nums2` de tamaño `m` y `n` respectivamente, devuelve la mediana de los dos arrays ordenados. El tiempo de ejecución general debe ser O(log(m+n)).",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Búsqueda Binaria en Particiones (Optimal O(log(min(m, n))))",
+                "explanation": "La clave es encontrar la partición correcta (`partitionX` y `partitionY`) que divida ambos arrays en dos mitades, de modo que todos los elementos en la mitad izquierda sean menores o iguales a todos los elementos en la mitad derecha. Se aplica búsqueda binaria al array más pequeño (para garantizar O(log(min(m, n)))). Si la condición se cumple, la mediana se calcula a partir de los elementos máximos de la izquierda y mínimos de la derecha.",
+                "code_snippet": "function findMedianSortedArrays(nums1, nums2) {\n    // Aseguramos que nums1 sea el array más pequeño para O(log(min(m,n)))\n    if (nums1.length > nums2.length) {\n        return findMedianSortedArrays(nums2, nums1);\n    }\n    \n    const x = nums1.length;\n    const y = nums2.length;\n    let low = 0;\n    let high = x;\n    \n    while (low <= high) {\n        const partitionX = Math.floor((low + high) / 2);\n        // (x + y + 1) para manejar ambos casos de longitud par e impar\n        const partitionY = Math.floor((x + y + 1) / 2) - partitionX;\n        \n        // Determinar maxLeft y minRight para las cuatro esquinas de las particiones\n        const maxX = (partitionX === 0) ? -Infinity : nums1[partitionX - 1];\n        const minX = (partitionX === x) ? Infinity : nums1[partitionX];\n        \n        const maxY = (partitionY === 0) ? -Infinity : nums2[partitionY - 1];\n        const minY = (partitionY === y) ? Infinity : nums2[partitionY];\n        \n        if (maxX <= minY && maxY <= minX) {\n            // Partición correcta encontrada\n            if ((x + y) % 2 === 0) {\n                // Caso par\n                return (Math.max(maxX, maxY) + Math.min(minX, minY)) / 2;\n            } else {\n                // Caso impar\n                return Math.max(maxX, maxY);\n            }\n        } else if (maxX > minY) {\n            // Necesitamos mover la particiónX hacia la izquierda\n            high = partitionX - 1;\n        } else {\n            // Necesitamos mover la particiónX hacia la derecha\n            low = partitionX + 1;\n        }\n    }\n}",
+                "complexity": "Time: O(log(min(M, N))), Space: O(1)",
+                "example": "Input: nums1 = [1, 3], nums2 = [2]\nOutput: 2.0"
+            }
+        ]
+    },
+    {
+        "id": "longest-palindromic-substring",
+        "title": "005. Longest Palindromic Substring",
+        "difficulty": "Medium",
+        "description": "Dada una cadena `s`, devuelve la subcadena palíndroma más larga en `s`.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Expand Around Center",
+                "explanation": "Un palíndromo siempre se expande desde su centro. Hay dos tipos de centros: un carácter único (ej: 'aba', centro 'b') o dos caracteres idénticos (ej: 'abba', centro 'bb'). Iteramos a través de la cadena y, para cada índice, consideramos que ese índice es el centro de un posible palíndromo (tanto impar como par). La función auxiliar `expand` encuentra la longitud máxima del palíndromo que se puede formar a partir de ese centro.",
+                "code_snippet": "function longestPalindrome(s) {\n    if (s.length < 2) return s;\n    let start = 0;\n    let maxLength = 1;\n\n    function expand(l, r) {\n        while (l >= 0 && r < s.length && s[l] === s[r]) {\n            l--;\n            r++;\n        }\n        // La longitud es (r-1) - (l+1) + 1 = r - l - 1\n        const currentLength = r - l - 1;\n        if (currentLength > maxLength) {\n            maxLength = currentLength;\n            start = l + 1;\n        }\n    }\n\n    for (let i = 0; i < s.length; i++) {\n        // Centro impar (ej: 'a b a')\n        expand(i, i);\n        // Centro par (ej: 'a bb a')\n        expand(i, i + 1);\n    }\n\n    return s.substring(start, start + maxLength);\n}",
+                "complexity": "Time: O(N^2), Space: O(1)",
+                "example": "Input: \"babad\"\nOutput: \"bab\" (o \"aba\")"
+            }
+        ]
+    },
+    {
+        "id": "string-to-integer-atoi",
+        "title": "008. String to Integer (atoi)",
+        "difficulty": "Medium",
+        "description": "Implementa la función `atoi(string s)` que convierte una cadena en un entero de 32 bits con signo. La función debe ignorar espacios en blanco, manejar signos opcionales y truncar el número si excede el rango de 32 bits.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Parsing de Estado Finito",
+                "explanation": "Simulamos el proceso de lectura de un entero con varios pasos (o estados): 1. Saltar espacios en blanco. 2. Determinar el signo (+/-). 3. Leer dígitos hasta encontrar un no-dígito. 4. Aplicar límites de 32 bits (Int32_MAX = 2147483647, Int32_MIN = -2147483648). Si en cualquier momento el `result` excede los límites, se debe truncar inmediatamente.",
+                "code_snippet": "function myAtoi(s) {\n    s = s.trim();\n    if (s.length === 0) return 0;\n    \n    let sign = 1;\n    let i = 0;\n    const MAX = 2147483647;\n    const MIN = -2147483648;\n\n    // 1. Manejar el signo\n    if (s[i] === '-') {\n        sign = -1;\n        i++;\n    } else if (s[i] === '+') {\n        i++;\n    }\n\n    let result = 0;\n    \n    // 2. Leer dígitos\n    while (i < s.length && s[i] >= '0' && s[i] <= '9') {\n        const digit = s.charCodeAt(i) - '0'.charCodeAt(0);\n        \n        // Comprobación de desbordamiento ANTES de multiplicar\n        if (sign === 1 && (result > Math.floor(MAX / 10) || (result === Math.floor(MAX / 10) && digit > 7))) {\n            return MAX;\n        }\n        if (sign === -1 && (result > Math.floor(MAX / 10) || (result === Math.floor(MAX / 10) && digit > 8))) {\n            return MIN;\n        }\n\n        result = result * 10 + digit;\n        i++;\n    }\n    \n    return result * sign;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: \"-42\"\nOutput: -42"
+            }
+        ]
+    },
+    {
+        "id": "remove-element",
+        "title": "027. Remove Element",
+        "difficulty": "Easy",
+        "description": "Dado un array `nums` y un valor `val`, elimina todas las ocurrencias de ese valor *in place* y devuelve la nueva longitud del array.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Two Pointers (Puntero de Escrito)",
+                "explanation": "Similar a 'Remove Duplicates', usamos un puntero de 'escritura' (`k`) que solo avanza cuando encontramos un elemento que *no* es el valor a remover (`val`). Iteramos con un puntero rápido (`i`). Si `nums[i]` no es igual a `val`, lo copiamos a la posición `nums[k]` y avanzamos `k`. Si `nums[i]` es igual a `val`, simplemente avanzamos `i`, dejando el valor en su lugar (se sobrescribirá más tarde).",
+                "code_snippet": "function removeElement(nums, val) {\n    let k = 0; // Índice para la colocación de elementos que no son 'val'\n    \n    for (let i = 0; i < nums.length; i++) {\n        if (nums[i] !== val) {\n            // Mover el elemento no deseado a la posición de escritura\n            nums[k] = nums[i];\n            k++;\n        }\n    }\n    // k es la nueva longitud\n    return k;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: [3, 2, 2, 3], val = 3\nOutput: 2, nums modificado a [2, 2, _, _]"
+            }
+        ]
+    },
+    {
+        "id": "divide-two-integers",
+        "title": "029. Divide Two Integers",
+        "difficulty": "Medium",
+        "description": "Dados dos enteros, `dividend` y `divisor`, divídelos sin usar los operadores de multiplicación, división o módulo. El resultado debe ser truncado hacia cero y limitado al rango de enteros de 32 bits.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Sustracción Repetida Optimizada (Bit Manipulation)",
+                "explanation": "La división es una sustracción repetida. Para optimizar, en lugar de restar el divisor una y otra vez, restamos múltiplos del divisor que crecen exponencialmente (divisor * 2, divisor * 4, divisor * 8, etc.) usando el desplazamiento de bits (`<<`). Esto permite reducir el tiempo de O(N) a O(log N). El problema se maneja mejor en valores absolutos para simplificar la lógica de sustracción, aplicando el signo al final y manejando el caso especial de desbordamiento.",
+                "code_snippet": "function divide(dividend, divisor) {\n    const MAX = 2147483647;\n    const MIN = -2147483648;\n\n    if (dividend === MIN && divisor === -1) return MAX; // Caso de desbordamiento especial\n\n    const isNegative = (dividend < 0) !== (divisor < 0);\n\n    // Usar valores absolutos (convertidos a positivos largos para evitar desbordamiento antes de tiempo)\n    let absDividend = Math.abs(dividend);\n    let absDivisor = Math.abs(divisor);\n    let quotient = 0;\n\n    while (absDividend >= absDivisor) {\n        let tempDivisor = absDivisor;\n        let multiple = 1;\n        \n        // Encontrar el mayor múltiplo de divisor que cabe en absDividend\n        while (absDividend >= (tempDivisor << 1)) {\n            tempDivisor <<= 1; // Duplicar el divisor\n            multiple <<= 1;    // Duplicar el cociente (2, 4, 8, ...)\n        }\n        \n        absDividend -= tempDivisor;\n        quotient += multiple;\n    }\n\n    const result = isNegative ? -quotient : quotient;\n    return Math.max(MIN, Math.min(MAX, result));\n}",
+                "complexity": "Time: O(log N), Space: O(1)",
+                "example": "Input: dividend = 10, divisor = 3\nOutput: 3"
+            }
+        ]
+    },
+    {
+        "id": "rotate-array",
+        "title": "189. Rotate Array",
+        "difficulty": "Medium",
+        "description": "Dado un array, rota el array hacia la derecha por `k` pasos. La rotación debe ser *in place*.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Reversa de Tres Pasos",
+                "explanation": "La solución más eficiente *in place* con O(1) de espacio es la reversa triple. Se basa en la observación de que rotar un array es equivalente a revertir las dos subsecciones de la partición de rotación. 1. Revertir todo el array. 2. Revertir los primeros `k` elementos. 3. Revertir los elementos restantes (N-k). Primero, se calcula $k = k \\pmod{N}$ para manejar rotaciones mayores que la longitud del array.",
+                "code_snippet": "function rotate(nums, k) {\n    const n = nums.length;\n    k = k % n; // Manejar k > n\n    \n    // Función auxiliar para revertir una subsección del array\n    const reverse = (arr, start, end) => {\n        while (start < end) {\n            [arr[start], arr[end]] = [arr[end], arr[start]];\n            start++;\n            end--;\n        }\n    };\n    \n    // 1. Revertir todo el array\n    reverse(nums, 0, n - 1);\n    \n    // 2. Revertir los primeros k elementos (que ahora son los últimos k)\n    reverse(nums, 0, k - 1);\n    \n    // 3. Revertir los n-k elementos restantes\n    reverse(nums, k, n - 1);\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: [1, 2, 3, 4, 5, 6, 7], k = 3\nOutput: [5, 6, 7, 1, 2, 3, 4]"
+            }
+        ]
+    },
+    {
+        "id": "majority-element",
+        "title": "169. Majority Element",
+        "difficulty": "Easy",
+        "description": "Dado un array de tamaño `n`, encuentra el elemento mayoritario. El elemento mayoritario es el elemento que aparece más de $\\lfloor n/2 \\rfloor$ veces. Puedes asumir que el array no es vacío y el elemento mayoritario siempre existe.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Algoritmo de Boyer-Moore Voting",
+                "explanation": "Este algoritmo es sorprendentemente simple y funciona en O(N) con O(1) de espacio. Se basa en la idea de que si contamos un elemento como 'candidato' y encontramos otro diferente, 'cancelamos' su cuenta. Dado que el elemento mayoritario aparece más de la mitad de las veces, su cuenta nunca será 0 al final. Inicializamos un `count` a 0 y un `candidate`. Por cada número, si `count` es 0, establecemos el número actual como el nuevo candidato. Si el número coincide con el candidato, incrementamos `count`; si no, lo decrementamos.",
+                "code_snippet": "function majorityElement(nums) {\n    let candidate = 0;\n    let count = 0;\n    \n    for (const num of nums) {\n        if (count === 0) {\n            candidate = num;\n        }\n        \n        if (num === candidate) {\n            count++;\n        } else {\n            count--;\n        }\n    }\n    return candidate;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: [2, 2, 1, 1, 1, 2, 2]\nOutput: 2"
+            }
+        ]
+    },
+    {
+        "id": "implement-queue-using-stacks",
+        "title": "232. Implement Queue using Stacks",
+        "difficulty": "Easy",
+        "description": "Implementa una cola FIFO (First-In, First-Out) usando solo dos pilas LIFO (Last-In, First-Out).",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Dos Pilas con Movimiento Perezoso (Lazy Transfer)",
+                "explanation": "Utilizamos dos pilas: `inputStack` (para `push`) y `outputStack` (para `pop`/`peek`). Los elementos se empujan primero en `inputStack`. Cuando se solicita una operación `pop` o `peek`, si `outputStack` está vacía, movemos **todos** los elementos de `inputStack` a `outputStack`. Esta transferencia invierte el orden, convirtiendo la operación LIFO de `inputStack` en FIFO en `outputStack`. Esta transferencia es amortizada O(1).",
+                "code_snippet": "class MyQueue {\n    constructor() {\n        this.inputStack = [];\n        this.outputStack = [];\n    }\n\n    // Mueve elementos de input a output, invirtiendo el orden\n    transfer() {\n        if (this.outputStack.length === 0) {\n            while (this.inputStack.length > 0) {\n                this.outputStack.push(this.inputStack.pop());\n            }\n        }\n    }\n\n    push(x) {\n        this.inputStack.push(x);\n    }\n\n    pop() {\n        this.transfer();\n        return this.outputStack.pop();\n    }\n\n    peek() {\n        this.transfer();\n        return this.outputStack[this.outputStack.length - 1];\n    }\n\n    empty() {\n        return this.inputStack.length === 0 && this.outputStack.length === 0;\n    }\n}",
+                "complexity": "Time: O(1) amortizado para todas las operaciones. O(N) en el peor caso de transferencia.",
+                "example": "push(1), push(2), peek() -> 1, pop() -> 1"
+            }
+        ]
+    },
+    {
+        "id": "intersection-of-two-arrays-ii",
+        "title": "350. Intersection of Two Arrays II",
+        "difficulty": "Easy",
+        "description": "Dados dos arrays, `nums1` y `nums2`, devuelve su intersección. Cada elemento en el resultado debe aparecer tantas veces como lo haga en ambos arrays. El resultado puede estar en cualquier orden.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Hash Map (Contador de Frecuencia)",
+                "explanation": "Para garantizar que se respete la frecuencia de los elementos (a diferencia de un Set que solo verifica la existencia), usamos un Hash Map para contar las frecuencias de los elementos en el array más pequeño. Luego, iteramos sobre el segundo array. Si un elemento existe en el mapa y su conteo es mayor que cero, lo agregamos al resultado y decrementamos su conteo en el mapa.",
+                "code_snippet": "function intersect(nums1, nums2) {\n    // Usar el array más pequeño para construir el mapa, optimizando espacio\n    if (nums1.length > nums2.length) {\n        return intersect(nums2, nums1);\n    }\n\n    const map = new Map();\n    for (const num of nums1) {\n        map.set(num, (map.get(num) || 0) + 1);\n    }\n\n    const result = [];\n    for (const num of nums2) {\n        const count = map.get(num);\n        if (count && count > 0) {\n            result.push(num);\n            map.set(num, count - 1); // Decrementar el conteo para no usarlo de nuevo\n        }\n    }\n    return result;\n}",
+                "complexity": "Time: O(N + M), Space: O(min(N, M))",
+                "example": "Input: nums1 = [1, 2, 2, 1], nums2 = [2, 2]\nOutput: [2, 2]"
+            }
+        ]
+    },
+    {
+        "id": "ransom-note",
+        "title": "383. Ransom Note",
+        "difficulty": "Easy",
+        "description": "Dadas dos cadenas, `ransomNote` y `magazine`, devuelve `true` si `ransomNote` se puede construir usando las letras de `magazine`; de lo contrario, devuelve `false`. Cada letra en `magazine` solo se puede usar una vez.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Contadores de Frecuencia (Array/Map)",
+                "explanation": "Este es un problema de conteo de frecuencia. Primero, contamos la ocurrencia de cada carácter en la `magazine`. Luego, iteramos a través de la `ransomNote`. Por cada carácter necesario, verificamos si su conteo en la `magazine` es mayor que cero. Si lo es, decrementamos el conteo; si no, significa que la revista no tiene suficientes letras, y devolvemos `false` inmediatamente.",
+                "code_snippet": "function canConstruct(ransomNote, magazine) {\n    const counts = new Array(26).fill(0);\n    \n    // Paso 1: Contar las letras en la magazine\n    for (const char of magazine) {\n        const index = char.charCodeAt(0) - 'a'.charCodeAt(0);\n        counts[index]++;\n    }\n    \n    // Paso 2: Verificar si la ransomNote se puede construir\n    for (const char of ransomNote) {\n        const index = char.charCodeAt(0) - 'a'.charCodeAt(0);\n        if (counts[index] > 0) {\n            counts[index]--;\n        } else {\n            return false; // No hay suficientes letras disponibles\n        }\n    }\n    \n    return true;\n}",
+                "complexity": "Time: O(M + N), donde M es la longitud de magazine y N es la longitud de ransomNote. Space: O(1) (porque el array de conteo es de tamaño 26).",
+                "example": "Input: ransomNote = \"aa\", magazine = \"ab\"\nOutput: false"
+            }
+        ]
+    },
+    {
+        "id": "first-unique-character-in-a-string",
+        "title": "387. First Unique Character in a String",
+        "difficulty": "Easy",
+        "description": "Dada una cadena `s`, encuentra el primer carácter no repetido en ella y devuelve su índice. Si no existe, devuelve -1.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Dos Pasadas con Hash Map/Array",
+                "explanation": "El desafío es encontrar el *primer* único. No podemos hacerlo en una sola pasada porque no sabemos si un carácter se repetirá más tarde. 1. Primera pasada: Usamos un mapa (o un array de tamaño 26 si solo son minúsculas) para contar la frecuencia de cada carácter. 2. Segunda pasada: Iteramos sobre la cadena *original*. Para cada carácter, consultamos su conteo. Si el conteo es 1, hemos encontrado el primer carácter no repetido y devolvemos su índice.",
+                "code_snippet": "function firstUniqChar(s) {\n    const charCounts = new Map();\n    \n    // Paso 1: Contar la frecuencia de cada caracter\n    for (const char of s) {\n        charCounts.set(char, (charCounts.get(char) || 0) + 1);\n    }\n    \n    // Paso 2: Buscar el primer caracter con conteo 1\n    for (let i = 0; i < s.length; i++) {\n        if (charCounts.get(s[i]) === 1) {\n            return i;\n        }\n    }\n    \n    return -1;\n}",
+                "complexity": "Time: O(N) (dos pasadas), Space: O(1) o O(AlphabetSize)",
+                "example": "Input: \"leetcode\"\nOutput: 0"
+            }
+        ]
+    },
+    {
+        "id": "missing-number",
+        "title": "268. Missing Number",
+        "difficulty": "Easy",
+        "description": "Dado un array `nums` que contiene `n` números distintos en el rango $[0, n]$, devuelve el único número en el rango que está ausente en el array.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Suma de Gauss",
+                "explanation": "La suma de los primeros $n$ enteros no negativos (0 a $n$) se puede calcular rápidamente usando la fórmula de Gauss: $\\frac{n(n+1)}{2}$. Si restamos la suma de todos los números en el array `nums` a esta suma esperada, el resultado será el número faltante.",
+                "code_snippet": "function missingNumber(nums) {\n    const n = nums.length;\n    // Suma esperada de 0 a n\n    const expectedSum = (n * (n + 1)) / 2;\n    \n    // Suma real de los números en el array\n    let actualSum = 0;\n    for (const num of nums) {\n        actualSum += num;\n    }\n    \n    return expectedSum - actualSum;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: [3, 0, 1]\nOutput: 2"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: XOR (Optimal)",
+                "explanation": "Podemos usar la propiedad XOR para encontrar el número faltante sin desbordamientos de enteros. Hacemos XOR de todos los números del array (`nums`) con todos los números del rango esperado ($0$ a $n$). Dado que $A \\oplus A = 0$ y $A \\oplus 0 = A$, todos los números presentes en el array se cancelarán con sus contrapartes en el rango, dejando solo el número faltante.",
+                "code_snippet": "function missingNumber(nums) {\n    let missing = nums.length; // Inicializar con N, que es parte del rango esperado\n    \n    for (let i = 0; i < nums.length; i++) {\n        // XOR de (índice) ^ (valor)\n        missing ^= i; \n        missing ^= nums[i];\n    }\n    \n    return missing;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: [9, 6, 4, 2, 3, 5, 7, 0, 1]\nOutput: 8"
+            }
+        ]
+    },
+    {
+        "id": "power-of-two",
+        "title": "231. Power of Two",
+        "difficulty": "Easy",
+        "description": "Dada un entero `n`, devuelve `true` si es una potencia de dos. En otras palabras, devuelve `true` si existe un entero `x` tal que $n = 2^x$.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Propiedad de Manipulación de Bits (Bitwise)",
+                "explanation": "Una propiedad fundamental de las potencias de dos en binario es que solo tienen un bit establecido (ej: $1 = 0001, 2 = 0010, 4 = 0100$). Si restamos 1 a una potencia de dos, todos los bits a la derecha del bit establecido se vuelven 1, y el bit establecido se vuelve 0 (ej: $4-1 = 3$, $0100 \\to 0011$). Por lo tanto, el AND bitwise (`&`) entre un número que es potencia de dos (`n`) y (`n-1`) siempre resultará en 0, es decir: $n \\& (n-1) = 0$. Debemos asegurarnos de que $n > 0$.",
+                "code_snippet": "function isPowerOfTwo(n) {\n    // 1. Debe ser positivo\n    // 2. n & (n - 1) debe ser cero para números con un solo bit establecido\n    return n > 0 && (n & (n - 1)) === 0;\n}",
+                "complexity": "Time: O(1), Space: O(1)",
+                "example": "Input: 16\nOutput: true (10000 & 01111 = 0)"
+            }
+        ]
+    },
+    {
+        "id": "happy-number",
+        "title": "202. Happy Number",
+        "difficulty": "Easy",
+        "description": "Un 'número feliz' es un número definido por el siguiente proceso: reemplaza el número por la suma de los cuadrados de sus dígitos. Repite el proceso hasta que el número sea 1 (donde permanecerá) o entre en un ciclo infinito que no incluye 1. Devuelve `true` si `n` es un número feliz, y `false` en caso contrario.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Detección de Ciclos (Floyd's Cycle-Finding Algorithm)",
+                "explanation": "El proceso de 'felicidad' genera una secuencia. Si la secuencia no llega a 1, debe entrar en un ciclo. Para detectar ciclos sin usar un Set para almacenar todos los números visitados, usamos el algoritmo de la tortuga y la liebre (slow and fast pointers), comúnmente usado en listas enlazadas. Si `slow` (avanza 1 paso) y `fast` (avanza 2 pasos) se encuentran en un valor que no es 1, hemos detectado un ciclo y el número no es feliz.",
+                "code_snippet": "function getNext(n) {\n    let sum = 0;\n    while (n > 0) {\n        const digit = n % 10;\n        sum += digit * digit;\n        n = Math.floor(n / 10);\n    }\n    return sum;\n}\n\nfunction isHappy(n) {\n    let slow = n;\n    let fast = getNext(n);\n    \n    while (fast !== 1 && slow !== fast) {\n        slow = getNext(slow);\n        fast = getNext(getNext(fast));\n    }\n    \n    // Si fast llegó a 1, es feliz. Si slow === fast (pero no 1), es un ciclo infeliz.\n    return fast === 1;\n}",
+                "complexity": "Time: O(log N). El número de pasos necesarios es limitado por el hecho de que la secuencia eventualmente cae por debajo de 243, y el ciclo se detecta rápidamente. Space: O(1)",
+                "example": "Input: 19\nOutput: true"
+            }
+        ]
+    },
+    {
+        "id": "valid-anagram",
+        "title": "242. Valid Anagram",
+        "difficulty": "Easy",
+        "description": "Dadas dos cadenas `s` y `t`, devuelve `true` si `t` es un anagrama de `s`, y `false` en caso contrario. Un anagrama es una palabra o frase formada al reordenar las letras de otra.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Contadores de Frecuencia (Array de 26)",
+                "explanation": "Dos cadenas son anagramas si, y solo si, tienen exactamente el mismo número de cada carácter. Primero verificamos si las longitudes son iguales. Luego, usamos un array de tamaño 26 para rastrear la frecuencia de cada letra. Incrementamos el contador para los caracteres en `s` y decrementamos para los caracteres en `t`. Si al final todos los conteos son cero, son anagramas.",
+                "code_snippet": "function isAnagram(s, t) {\n    if (s.length !== t.length) return false;\n    \n    const counts = new Array(26).fill(0);\n    const base = 'a'.charCodeAt(0);\n    \n    // 1. Contar s e 'descontar' t\n    for (let i = 0; i < s.length; i++) {\n        counts[s.charCodeAt(i) - base]++;\n        counts[t.charCodeAt(i) - base]--;\n    }\n    \n    // 2. Verificar que todos los conteos sean cero\n    for (const count of counts) {\n        if (count !== 0) return false;\n    }\n    \n    return true;\n}",
+                "complexity": "Time: O(N), Space: O(1) (por el array de 26)",
+                "example": "Input: s = \"anagram\", t = \"nagaram\"\nOutput: true"
+            }
+        ]
+    },
+    {
+        "id": "count-primes",
+        "title": "204. Count Primes",
+        "difficulty": "Medium",
+        "description": "Dado un entero `n`, devuelve el número de números primos que son estrictamente menores que `n`.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Criba de Eratóstenes (Sieve of Eratosthenes)",
+                "explanation": "La Criba es un algoritmo antiguo y eficiente para encontrar todos los números primos hasta un límite dado. Inicializamos un array booleano, asumiendo que todos los números (excepto 0 y 1) son primos. Iteramos desde $i=2$ hasta $\\sqrt{n}$. Si $i$ es primo (marcado como true), marcamos todos sus múltiplos ($i^2, i^2+i, i^2+2i, \dots$) como no primos (false). Al finalizar, contamos cuántos valores quedaron marcados como `true`.",
+                "code_snippet": "function countPrimes(n) {\n    if (n <= 2) return 0;\n    \n    // Inicializar un array booleano, donde primos[i] es true si i es primo\n    const isPrime = new Array(n).fill(true);\n    isPrime[0] = isPrime[1] = false; // 0 y 1 no son primos\n    \n    // Iterar hasta la raíz cuadrada de n\n    for (let i = 2; i * i < n; i++) {\n        if (isPrime[i]) {\n            // Marcar todos los múltiplos de i como no primos\n            for (let j = i * i; j < n; j += i) {\n                isPrime[j] = false;\n            }\n        }\n    }\n    \n    // Contar los que quedaron marcados como true\n    let count = 0;\n    for (let i = 0; i < n; i++) {\n        if (isPrime[i]) {\n            count++;\n        }\n    }\n    \n    return count;\n}",
+                "complexity": "Time: O(N log log N), Space: O(N)",
+                "example": "Input: 10\nOutput: 4 (Primos: 2, 3, 5, 7)"
+            }
+        ]
+    }
+]
