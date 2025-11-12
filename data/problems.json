@@ -510,21 +510,5 @@
                 "example": "Input: s = \"anagram\", t = \"nagaram\"\nOutput: true"
             }
         ]
-    },
-    {
-        "id": "count-primes",
-        "title": "204. Count Primes",
-        "difficulty": "Medium",
-        "description": "Dado un entero `n`, devuelve el número de números primos que son estrictamente menores que `n`.",
-        "solutions": [
-            {
-                "id": 1,
-                "title": "Solución 1: Criba de Eratóstenes (Sieve of Eratosthenes)",
-                "explanation": "La Criba es un algoritmo antiguo y eficiente para encontrar todos los números primos hasta un límite dado. Inicializamos un array booleano, asumiendo que todos los números (excepto 0 y 1) son primos. Iteramos desde $i=2$ hasta $\\sqrt{n}$. Si $i$ es primo (marcado como true), marcamos todos sus múltiplos ($i^2, i^2+i, i^2+2i, \dots$) como no primos (false). Al finalizar, contamos cuántos valores quedaron marcados como `true`.",
-                "code_snippet": "function countPrimes(n) {\n    if (n <= 2) return 0;\n    \n    // Inicializar un array booleano, donde primos[i] es true si i es primo\n    const isPrime = new Array(n).fill(true);\n    isPrime[0] = isPrime[1] = false; // 0 y 1 no son primos\n    \n    // Iterar hasta la raíz cuadrada de n\n    for (let i = 2; i * i < n; i++) {\n        if (isPrime[i]) {\n            // Marcar todos los múltiplos de i como no primos\n            for (let j = i * i; j < n; j += i) {\n                isPrime[j] = false;\n            }\n        }\n    }\n    \n    // Contar los que quedaron marcados como true\n    let count = 0;\n    for (let i = 0; i < n; i++) {\n        if (isPrime[i]) {\n            count++;\n        }\n    }\n    \n    return count;\n}",
-                "complexity": "Time: O(N log log N), Space: O(N)",
-                "example": "Input: 10\nOutput: 4 (Primos: 2, 3, 5, 7)"
-            }
-        ]
     }
 ]
