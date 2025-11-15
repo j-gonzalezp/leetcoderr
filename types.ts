@@ -3,6 +3,7 @@ export interface Solution {
   title: string;
   explanation: string;
   code_snippet: string;
+  complexity?: string;
   example: string;
 }
 

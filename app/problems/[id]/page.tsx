@@ -26,7 +26,10 @@ async function ProblemPage({ params }: ProblemPageProps) {
 
 export default ProblemPage;
 
-// Static Generation
+// Static Generation - Forzar generación estática para mejor caché
+export const dynamic = 'force-static';
+export const dynamicParams = false;
+
 export function generateStaticParams() {
     return (problemsData as Problem[]).map(problem => ({
         id: problem.id,

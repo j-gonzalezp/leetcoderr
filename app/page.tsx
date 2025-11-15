@@ -1,6 +1,9 @@
 import { Problem } from '@/types';
 import problemsData from '@/data/problems.json';
 
+// Static Generation - Forzar generación estática para mejor caché
+export const dynamic = 'force-static';
+
 export default function Home() {
   const problemsList = (problemsData as Problem[]).map((p: Problem) => ({ id: p.id, title: p.title }));
 

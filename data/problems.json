@@ -510,5 +510,645 @@
                 "example": "Input: s = \"anagram\", t = \"nagaram\"\nOutput: true"
             }
         ]
+    },
+    {
+        "id": "climbing-stairs",
+        "title": "070. Climbing Stairs",
+        "difficulty": "Easy",
+        "description": "Estás subiendo una escalera. Se necesitan `n` escalones para llegar a la cima. Cada vez puedes subir 1 o 2 escalones. ¿De cuántas maneras distintas puedes subir hasta la cima?",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Programación Dinámica (Bottom-Up)",
+                "explanation": "Este es un problema clásico de programación dinámica que sigue la secuencia de Fibonacci. El número de formas de llegar al escalón `i` es la suma de las formas de llegar al escalón `i-1` (dando un paso) y las formas de llegar al escalón `i-2` (dando dos pasos). Construimos una tabla `dp` desde la base (0 y 1 escalones) hasta `n`.",
+                "code_snippet": "function climbStairs(n) {\n    if (n <= 2) return n;\n    \n    let dp = new Array(n + 1);\n    dp[1] = 1;\n    dp[2] = 2;\n    \n    for (let i = 3; i <= n; i++) {\n        dp[i] = dp[i - 1] + dp[i - 2];\n    }\n    \n    return dp[n];\n}",
+                "complexity": "Time: O(N), Space: O(N)",
+                "example": "Input: 4\nOutput: 5 (1+1+1+1, 1+1+2, 1+2+1, 2+1+1, 2+2)"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Programación Dinámica Optimizada (Fibonacci)",
+                "explanation": "Notamos que para calcular `dp[i]`, solo necesitamos los dos valores anteriores (`dp[i-1]` y `dp[i-2]`). Por lo tanto, no necesitamos un array completo, solo dos variables para almacenar los dos números de Fibonacci anteriores. Esto reduce el espacio a O(1).",
+                "code_snippet": "function climbStairs(n) {\n    if (n <= 2) return n;\n    \n    let one_step_before = 2;\n    let two_steps_before = 1;\n    let all_ways = 0;\n    \n    for (let i = 3; i <= n; i++) {\n        all_ways = one_step_before + two_steps_before;\n        two_steps_before = one_step_before;\n        one_step_before = all_ways;\n    }\n    \n    return all_ways;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: 4\nOutput: 5"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Recursión con Memoización (Top-Down)",
+                "explanation": "La solución recursiva directa (`climb(n) = climb(n-1) + climb(n-2)`) es ineficiente debido a cálculos repetidos (O(2^n)). Podemos optimizarla drásticamente utilizando memoización: almacenamos el resultado de cada subproblema (escalón `i`) en un mapa o array la primera vez que se calcula. Las llamadas posteriores para el mismo escalón devuelven el resultado almacenado en tiempo O(1).",
+                "code_snippet": "function climbStairs(n) {\n    const memo = new Map();\n\n    function climb(k) {\n        if (k <= 2) return k;\n        if (memo.has(k)) return memo.get(k);\n\n        const result = climb(k - 1) + climb(k - 2);\n        memo.set(k, result);\n        return result;\n    }\n\n    return climb(n);\n}",
+                "complexity": "Time: O(N), Space: O(N) [por la pila de recursión y el mapa]",
+                "example": "Input: 4\nOutput: 5"
+            }
+        ]
+    },
+    {
+        "id": "reverse-linked-list",
+        "title": "206. Reverse Linked List",
+        "difficulty": "Easy",
+        "description": "Dada la cabeza de una lista enlazada simple, invierte la lista y devuelve la nueva cabeza.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Iterativa con Tres Punteros",
+                "explanation": "Esta es la solución más común y eficiente en espacio. Utilizamos tres punteros: `prev` (inicialmente `null`), `current` (inicialmente `head`) y `nextTemp`. En cada paso, guardamos el siguiente nodo (`nextTemp`), revertimos el puntero del nodo actual para que apunte a `prev`, y luego movemos `prev` y `current` un paso hacia adelante.",
+                "code_snippet": "function reverseList(head) {\n    let prev = null;\n    let current = head;\n    \n    while (current !== null) {\n        const nextTemp = current.next; // Guardar el siguiente nodo\n        current.next = prev;         // Revertir el puntero\n        prev = current;              // Mover prev hacia adelante\n        current = nextTemp;          // Mover current hacia adelante\n    }\n    \n    // Al final, prev es la nueva cabeza\n    return prev;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: 1 -> 2 -> 3 -> NULL\nOutput: 3 -> 2 -> 1 -> NULL"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Recursiva",
+                "explanation": "La recursión divide el problema: asume que el resto de la lista (`head.next`) ya ha sido invertido. La tarea es entonces hacer que el siguiente nodo (`head.next`) apunte de vuelta a la cabeza actual (`head`), y que la cabeza actual apunte a `null`. El caso base es cuando la cabeza es nula o es el último nodo.",
+                "code_snippet": "function reverseList(head) {\n    // Caso base: lista vacía o de un solo nodo\n    if (head === null || head.next === null) {\n        return head;\n    }\n    \n    // Invertir el resto de la lista\n    const newHead = reverseList(head.next);\n    \n    // Re-enlazar\n    head.next.next = head; // El nodo que era el siguiente ahora apunta hacia atrás, a mí\n    head.next = null;      // Mi puntero 'next' ahora es null, convirtiéndome en la nueva cola\n    \n    return newHead;\n}",
+                "complexity": "Time: O(N), Space: O(N) [por la pila de recursión]",
+                "example": "Input: 1 -> 2 -> 3 -> NULL\nOutput: 3 -> 2 -> 1 -> NULL"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Usando una Pila (Stack)",
+                "explanation": "Este enfoque es más intuitivo pero menos eficiente en espacio. Primero, recorremos la lista enlazada y empujamos cada nodo a una pila. Debido a la naturaleza LIFO (Last-In, First-Out) de la pila, los nodos se almacenan en orden inverso. Luego, creamos una nueva lista extrayendo los nodos de la pila y enlazándolos.",
+                "code_snippet": "function reverseList(head) {\n    if (!head) return null;\n    \n    const stack = [];\n    let current = head;\n    while (current) {\n        stack.push(current);\n        current = current.next;\n    }\n    \n    const newHead = stack.pop();\n    current = newHead;\n    \n    while (stack.length > 0) {\n        current.next = stack.pop();\n        current = current.next;\n    }\n    \n    current.next = null; // Asegurar que el último nodo apunte a null\n    return newHead;\n}",
+                "complexity": "Time: O(N), Space: O(N)",
+                "example": "Input: 1 -> 2 -> 3 -> NULL\nOutput: 3 -> 2 -> 1 -> NULL"
+            }
+        ]
+    },
+    {
+        "id": "validate-binary-search-tree",
+        "title": "098. Validate Binary Search Tree",
+        "difficulty": "Medium",
+        "description": "Dado el `root` de un árbol binario, determina si es un Árbol de Búsqueda Binario (BST) válido. Un BST válido se define como: el subárbol izquierdo de un nodo contiene solo nodos con claves menores que la clave del nodo; el subárbol derecho contiene solo nodos con claves mayores; y ambos subárboles (izquierdo y derecho) también deben ser árboles de búsqueda binarios.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Recursión con Rango Válido (min, max)",
+                "explanation": "Un error común es solo verificar `node.left.val < node.val` y `node.right.val > node.val`. La solución correcta es asegurar que todos los nodos en el subárbol izquierdo sean menores que el nodo actual y que todos los del subárbol derecho sean mayores. Esto se logra pasando un rango de valores permitidos (`min`, `max`) en cada llamada recursiva. Para un nodo, todos sus descendientes izquierdos deben ser mayores que `min` y menores que `node.val`.",
+                "code_snippet": "function isValidBST(root) {\n    function validate(node, min, max) {\n        if (!node) return true;\n        \n        if ((min !== null && node.val <= min) || (max !== null && node.val >= max)) {\n            return false;\n        }\n        \n        // El subárbol izquierdo debe estar entre min y node.val\n        // El subárbol derecho debe estar entre node.val y max\n        return validate(node.left, min, node.val) && validate(node.right, node.val, max);\n    }\n    \n    return validate(root, null, null);\n}",
+                "complexity": "Time: O(N), Space: O(H) [Altura del árbol]",
+                "example": "Input: [5, 1, 7, null, null, 6, 8]\nOutput: false (6 es menor que 7 pero está en su subárbol izquierdo)"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Recorrido In-Order (DFS)",
+                "explanation": "Una propiedad clave de un BST es que un recorrido in-order (izquierda, raíz, derecha) visita los nodos en orden ascendente estricto. Podemos realizar un recorrido in-order y mantener un registro del valor del nodo visitado previamente. Si en algún momento el valor del nodo actual es menor o igual que el valor del nodo previo, el árbol no es un BST.",
+                "code_snippet": "function isValidBST(root) {\n    let prev = -Infinity;\n\n    function inOrder(node) {\n        if (!node) return true;\n\n        // 1. Recorrer subárbol izquierdo\n        if (!inOrder(node.left)) return false;\n\n        // 2. Procesar nodo actual (verificar orden)\n        if (node.val <= prev) return false;\n        prev = node.val;\n\n        // 3. Recorrer subárbol derecho\n        return inOrder(node.right);\n    }\n\n    return inOrder(root);\n}",
+                "complexity": "Time: O(N), Space: O(H) [Altura del árbol]",
+                "example": "Input: [2, 1, 3]\nOutput: true"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Recorrido In-Order Iterativo con Pila",
+                "explanation": "Esta solución evita la recursión profunda para árboles desbalanceados, utilizando una pila explícita para simular el recorrido in-order. Empujamos los nodos izquierdos a la pila hasta llegar al más izquierdo. Luego, extraemos un nodo, verificamos su valor contra el `previo` (como en la solución 2), y luego procesamos su subárbol derecho.",
+                "code_snippet": "function isValidBST(root) {\n    const stack = [];\n    let prev = -Infinity;\n    let current = root;\n\n    while (current !== null || stack.length > 0) {\n        // Ir al hijo más a la izquierda\n        while (current !== null) {\n            stack.push(current);\n            current = current.left;\n        }\n\n        current = stack.pop();\n\n        // Procesar nodo (verificar orden)\n        if (current.val <= prev) return false;\n        prev = current.val;\n\n        // Mover al subárbol derecho\n        current = current.right;\n    }\n\n    return true;\n}",
+                "complexity": "Time: O(N), Space: O(H) [Altura del árbol]",
+                "example": "Input: [5, 4, 6, null, null, 3, 7]\nOutput: false"
+            }
+        ]
+    },
+    {
+        "id": "product-of-array-except-self",
+        "title": "238. Product of Array Except Self",
+        "difficulty": "Medium",
+        "description": "Dado un array de enteros `nums`, devuelve un array `answer` tal que `answer[i]` es igual al producto de todos los elementos de `nums` excepto `nums[i]`. Debes resolverlo sin usar el operador de división y en tiempo O(N).",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Usando Arrays de Prefijos y Sufijos",
+                "explanation": "La clave es darse cuenta de que el producto deseado en el índice `i` es (`producto de todos los elementos a la izquierda de i`) * (`producto de todos los elementos a la derecha de i`). Podemos precalcular estos productos en dos arrays separados: uno para los prefijos y otro para los sufijos. Luego, multiplicamos los valores correspondientes para obtener el resultado final.",
+                "code_snippet": "function productExceptSelf(nums) {\n    const n = nums.length;\n    const leftProducts = new Array(n).fill(1);\n    const rightProducts = new Array(n).fill(1);\n    const answer = new Array(n);\n\n    // Calcular productos de prefijos\n    for (let i = 1; i < n; i++) {\n        leftProducts[i] = leftProducts[i - 1] * nums[i - 1];\n    }\n\n    // Calcular productos de sufijos\n    for (let i = n - 2; i >= 0; i--) {\n        rightProducts[i] = rightProducts[i + 1] * nums[i + 1];\n    }\n\n    // Calcular la respuesta final\n    for (let i = 0; i < n; i++) {\n        answer[i] = leftProducts[i] * rightProducts[i];\n    }\n\n    return answer;\n}",
+                "complexity": "Time: O(N), Space: O(N)",
+                "example": "Input: [1, 2, 3, 4]\nOutput: [24, 12, 8, 6]"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Óptima con Espacio O(1)",
+                "explanation": "Podemos optimizar la solución anterior para usar espacio constante (sin contar el array de salida). Primero, llenamos el array de respuesta con los productos de prefijos en una pasada. Luego, en una segunda pasada de derecha a izquierda, calculamos los productos de sufijos sobre la marcha con una variable y los multiplicamos por los prefijos ya almacenados en el array de respuesta.",
+                "code_snippet": "function productExceptSelf(nums) {\n    const n = nums.length;\n    const answer = new Array(n).fill(1);\n\n    // 1. Llenar con productos de prefijos\n    for (let i = 1; i < n; i++) {\n        answer[i] = answer[i - 1] * nums[i - 1];\n    }\n\n    // 2. Multiplicar por productos de sufijos sobre la marcha\n    let rightProduct = 1;\n    for (let i = n - 1; i >= 0; i--) {\n        answer[i] *= rightProduct;\n        rightProduct *= nums[i];\n    }\n\n    return answer;\n}",
+                "complexity": "Time: O(N), Space: O(1) [sin contar el array de salida]",
+                "example": "Input: [1, 2, 3, 4]\nOutput: [24, 12, 8, 6]"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Fuerza Bruta (Ineficiente)",
+                "explanation": "La forma más directa pero ineficiente es usar dos bucles anidados. Para cada elemento en el índice `i`, iteramos a través de todo el array nuevamente, multiplicando todos los elementos excepto el que se encuentra en `i`. Aunque es fácil de entender, su complejidad cuadrática lo hace inadecuado para arrays grandes.",
+                "code_snippet": "function productExceptSelf(nums) {\n    const n = nums.length;\n    const answer = [];\n    \n    for (let i = 0; i < n; i++) {\n        let product = 1;\n        for (let j = 0; j < n; j++) {\n            if (i !== j) {\n                product *= nums[j];\n            }\n        }\n        answer.push(product);\n    }\n    \n    return answer;\n}",
+                "complexity": "Time: O(N^2), Space: O(1) [sin contar el array de salida]",
+                "example": "Input: [1, 2, 3, 4]\nOutput: [24, 12, 8, 6]"
+            }
+        ]
+    },
+    {
+        "id": "binary-tree-level-order-traversal",
+        "title": "102. Binary Tree Level Order Traversal",
+        "difficulty": "Medium",
+        "description": "Dado el `root` de un árbol binario, devuelve el recorrido por niveles de los valores de sus nodos (es decir, de izquierda a derecha, nivel por nivel).",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Iterativa con Cola (BFS)",
+                "explanation": "Este es el enfoque estándar para el recorrido por niveles, utilizando Búsqueda en Anchura (BFS). Usamos una cola para mantener los nodos de cada nivel. En cada iteración del bucle principal, procesamos todos los nodos del nivel actual (determinando el tamaño de la cola al inicio del bucle). Para cada nodo extraído, agregamos su valor al resultado del nivel y encolamos a sus hijos.",
+                "code_snippet": "function levelOrder(root) {\n    if (!root) return [];\n\n    const queue = [root];\n    const result = [];\n\n    while (queue.length > 0) {\n        const levelSize = queue.length;\n        const currentLevel = [];\n\n        for (let i = 0; i < levelSize; i++) {\n            const node = queue.shift();\n            currentLevel.push(node.val);\n\n            if (node.left) queue.push(node.left);\n            if (node.right) queue.push(node.right);\n        }\n        result.push(currentLevel);\n    }\n\n    return result;\n}",
+                "complexity": "Time: O(N), Space: O(W) [Ancho máximo del árbol]",
+                "example": "Input: [3, 9, 20, null, null, 15, 7]\nOutput: [[3],[9,20],[15,7]]"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Recursiva con Profundidad (DFS)",
+                "explanation": "Aunque BFS es más natural, también podemos usar Búsqueda en Profundidad (DFS). Creamos una función auxiliar que toma el nodo y su nivel actual. Mantenemos un array de resultados donde el índice corresponde al nivel. Cuando visitamos un nodo en un nivel `d`, si `result[d]` no existe, lo creamos. Luego, agregamos el valor del nodo a `result[d]` y llamamos recursivamente para los hijos en el nivel `d+1`.",
+                "code_snippet": "function levelOrder(root) {\n    const result = [];\n\n    function dfs(node, level) {\n        if (!node) return;\n\n        // Si el nivel no existe en el resultado, créalo\n        if (level === result.length) {\n            result.push([]);\n        }\n\n        // Agrega el valor del nodo al nivel correspondiente\n        result[level].push(node.val);\n\n        // Llama recursivamente para los hijos\n        dfs(node.left, level + 1);\n        dfs(node.right, level + 1);\n    }\n\n    dfs(root, 0);\n    return result;\n}",
+                "complexity": "Time: O(N), Space: O(H) [Altura del árbol para la pila de recursión]",
+                "example": "Input: [3, 9, 20, null, null, 15, 7]\nOutput: [[3],[9,20],[15,7]]"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: BFS con Dos Colas",
+                "explanation": "Una variación del BFS que evita la necesidad de obtener el tamaño de la cola en cada nivel. Se utilizan dos colas: `currentLevelQueue` y `nextLevelQueue`. Mientras la cola del nivel actual no esté vacía, extraemos nodos, procesamos sus valores y agregamos sus hijos a la cola del siguiente nivel. Una vez que la cola actual está vacía, el nivel se ha procesado, y cambiamos las colas para la siguiente iteración.",
+                "code_snippet": "function levelOrder(root) {\n    if (!root) return [];\n    \n    let currentLevelQueue = [root];\n    let result = [];\n\n    while (currentLevelQueue.length > 0) {\n        let nextLevelQueue = [];\n        let currentLevelValues = [];\n\n        for (const node of currentLevelQueue) {\n            currentLevelValues.push(node.val);\n            if (node.left) nextLevelQueue.push(node.left);\n            if (node.right) nextLevelQueue.push(node.right);\n        }\n        \n        result.push(currentLevelValues);\n        currentLevelQueue = nextLevelQueue;\n    }\n\n    return result;\n}",
+                "complexity": "Time: O(N), Space: O(W) [Ancho máximo del árbol]",
+                "example": "Input: [3, 9, 20, null, null, 15, 7]\nOutput: [[3],[9,20],[15,7]]"
+            }
+        ]
+    },
+    {
+        "id": "3sum",
+        "title": "015. 3Sum",
+        "difficulty": "Medium",
+        "description": "Dado un array de enteros `nums`, encuentra todos los tripletes únicos `[nums[i], nums[j], nums[k]]` tales que `i != j`, `i != k`, `j != k`, y `nums[i] + nums[j] + nums[k] == 0`.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Fuerza Bruta",
+                "explanation": "La solución más directa es usar tres bucles anidados para iterar sobre todas las combinaciones posibles de tres números. Para evitar duplicados en el resultado, se ordena cada triplete encontrado y se almacena en un Set para garantizar la unicidad.",
+                "code_snippet": "function threeSum(nums) {\n    const result = [];\n    nums.sort((a, b) => a - b);\n    for (let i = 0; i < nums.length - 2; i++) {\n        // Evitar duplicados para el primer número\n        if (i > 0 && nums[i] === nums[i - 1]) continue;\n        for (let j = i + 1; j < nums.length - 1; j++) {\n            // Evitar duplicados para el segundo número\n            if (j > i + 1 && nums[j] === nums[j - 1]) continue;\n            for (let k = j + 1; k < nums.length; k++) {\n                // Evitar duplicados para el tercer número\n                if (k > j + 1 && nums[k] === nums[k - 1]) continue;\n                if (nums[i] + nums[j] + nums[k] === 0) {\n                    result.push([nums[i], nums[j], nums[k]]);\n                }\n            }\n        }\n    }\n    return result;\n}",
+                "complexity": "Time: O(N^3), Space: O(1) [sin contar la salida]",
+                "example": "Input: [-1, 0, 1, 2, -1, -4]\nOutput: [[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Hash Set (Variación de Two Sum)",
+                "explanation": "Iteramos a través del array con un puntero `i`. Para cada `nums[i]`, el problema se reduce a encontrar dos números en el resto del array que sumen `-nums[i]` (un problema de Two Sum). Podemos resolver este subproblema en tiempo O(N) usando un Hash Set, lo que da una complejidad total de O(N^2). La gestión de duplicados es crucial.",
+                "code_snippet": "function threeSum(nums) {\n    const result = [];\n    nums.sort((a, b) => a - b);\n\n    for (let i = 0; i < nums.length; i++) {\n        if (i > 0 && nums[i] === nums[i - 1]) continue; // Evitar duplicados\n        \n        const seen = new Set();\n        for (let j = i + 1; j < nums.length; j++) {\n            const complement = -nums[i] - nums[j];\n            if (seen.has(complement)) {\n                result.push([nums[i], complement, nums[j]]);\n                // Saltar duplicados para el tercer número\n                while (j + 1 < nums.length && nums[j] === nums[j + 1]) j++;\n            }\n            seen.add(nums[j]);\n        }\n    }\n    return result;\n}",
+                "complexity": "Time: O(N^2), Space: O(N)",
+                "example": "Input: [-1, 0, 1, 2, -1, -4]\nOutput: [[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Two Pointers (Óptima)",
+                "explanation": "La solución más eficiente. Primero, ordenamos el array. Luego, iteramos con un puntero `i`. Para cada `nums[i]`, usamos dos punteros, `left` (en `i+1`) y `right` (al final del array), que se mueven hacia el centro. Si la suma es menor que 0, movemos `left` a la derecha. Si es mayor, movemos `right` a la izquierda. Si es 0, hemos encontrado un triplete, lo guardamos y movemos ambos punteros, saltando duplicados.",
+                "code_snippet": "function threeSum(nums) {\n    nums.sort((a, b) => a - b);\n    const result = [];\n\n    for (let i = 0; i < nums.length - 2; i++) {\n        if (i > 0 && nums[i] === nums[i - 1]) continue; // Evitar duplicados del primer número\n\n        let left = i + 1;\n        let right = nums.length - 1;\n\n        while (left < right) {\n            const sum = nums[i] + nums[left] + nums[right];\n            if (sum === 0) {\n                result.push([nums[i], nums[left], nums[right]]);\n                // Saltar duplicados\n                while (left < right && nums[left] === nums[left + 1]) left++;\n                while (left < right && nums[right] === nums[right - 1]) right--;\n                left++;\n                right--;\n            } else if (sum < 0) {\n                left++;\n            } else {\n                right--;\n            }\n        }\n    }\n    return result;\n}",
+                "complexity": "Time: O(N^2), Space: O(1) o O(log N) [por la ordenación]",
+                "example": "Input: [-1, 0, 1, 2, -1, -4]\nOutput: [[-1, -1, 2], [-1, 0, 1]]"
+            }
+        ]
+    },
+    {
+        "id": "merge-intervals",
+        "title": "056. Merge Intervals",
+        "difficulty": "Medium",
+        "description": "Dado un array de `intervals` donde `intervals[i] = [starti, endi]`, fusiona todos los intervalos superpuestos y devuelve un array de los intervalos no superpuestos que cubren todos los intervalos de la entrada.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Ordenar y Fusionar (Óptima)",
+                "explanation": "El enfoque más eficiente. Primero, ordenamos los intervalos basándonos en su valor de inicio. Luego, iteramos a través de los intervalos ordenados. Mantenemos una lista de resultados. Si el intervalo actual se superpone con el último intervalo en nuestra lista de resultados, fusionamos ambos actualizando el final del último intervalo. Si no se superpone, simplemente lo añadimos a la lista de resultados.",
+                "code_snippet": "function merge(intervals) {\n    if (intervals.length === 0) return [];\n\n    // 1. Ordenar por el inicio del intervalo\n    intervals.sort((a, b) => a[0] - b[0]);\n\n    const merged = [intervals[0]];\n\n    for (let i = 1; i < intervals.length; i++) {\n        const lastMerged = merged[merged.length - 1];\n        const current = intervals[i];\n\n        // Comprobar superposición\n        if (current[0] <= lastMerged[1]) {\n            // Fusionar actualizando el final\n            lastMerged[1] = Math.max(lastMerged[1], current[1]);\n        } else {\n            // No hay superposición, añadir el intervalo\n            merged.push(current);\n        }\n    }\n    return merged;\n}",
+                "complexity": "Time: O(N log N) [dominado por la ordenación], Space: O(N) [en el peor caso]",
+                "example": "Input: [[1,3],[2,6],[8,10],[15,18]]\nOutput: [[1,6],[8,10],[15,18]]"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Fuerza Bruta con Búsqueda Repetida",
+                "explanation": "Un enfoque menos eficiente. Usamos un bucle que se repite hasta que no se puedan realizar más fusiones. Dentro del bucle, iteramos sobre todos los pares de intervalos. Si encontramos un par que se superpone, los fusionamos en un nuevo intervalo, eliminamos los dos originales y añadimos el nuevo. Este proceso es ineficiente debido a las repetidas búsquedas y modificaciones de la lista.",
+                "code_snippet": "// Esta implementación es compleja y propensa a errores, se muestra conceptualmente.\nfunction merge(intervals) {\n    let merged = true;\n    while (merged) {\n        merged = false;\n        for (let i = 0; i < intervals.length; i++) {\n            for (let j = i + 1; j < intervals.length; j++) {\n                const [start1, end1] = intervals[i];\n                const [start2, end2] = intervals[j];\n                // Comprobar superposición\n                if (Math.max(start1, start2) <= Math.min(end1, end2)) {\n                    const newInterval = [Math.min(start1, start2), Math.max(end1, end2)];\n                    intervals.splice(j, 1);\n                    intervals.splice(i, 1);\n                    intervals.push(newInterval);\n                    merged = true;\n                    // Romper bucles para reiniciar la búsqueda\n                    break;\n                }\n            }\n            if (merged) break;\n        }\n    }\n    return intervals;\n}",
+                "complexity": "Time: O(N^2) o peor, Space: O(1) [modifica in-place]",
+                "example": "Input: [[1,4],[0,4]]\nOutput: [[0,4]]"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Basada en Grafos (Componentes Conectados)",
+                "explanation": "Un enfoque conceptualmente diferente. Podemos modelar el problema como la búsqueda de componentes conectados en un grafo. Cada intervalo es un nodo. Existe una arista entre dos nodos si sus intervalos se superponen. El problema se reduce a encontrar los componentes conectados. Para cada componente, el intervalo fusionado es `[min(inicios), max(finales)]` de todos los intervalos en ese componente.",
+                "code_snippet": "// Código conceptual, requiere construir un grafo y ejecutar DFS/BFS.\nfunction merge(intervals) {\n    // 1. Construir un grafo: las aristas conectan intervalos que se superponen.\n    const graph = new Map();\n    for (let i = 0; i < intervals.length; i++) graph.set(i, []);\n    for (let i = 0; i < intervals.length; i++) {\n        for (let j = i + 1; j < intervals.length; j++) {\n            const [s1, e1] = intervals[i];\n            const [s2, e2] = intervals[j];\n            if (s1 <= e2 && s2 <= e1) {\n                graph.get(i).push(j);\n                graph.get(j).push(i);\n            }\n        }\n    }\n\n    // 2. Encontrar componentes conectados usando DFS/BFS.\n    const visited = new Set();\n    const result = [];\n    for (let i = 0; i < intervals.length; i++) {\n        if (!visited.has(i)) {\n            const componentNodes = [];\n            const stack = [i];\n            visited.add(i);\n            while (stack.length) {\n                const node = stack.pop();\n                componentNodes.push(node);\n                for (const neighbor of graph.get(node)) {\n                    if (!visited.has(neighbor)) {\n                        visited.add(neighbor);\n                        stack.push(neighbor);\n                    }\n                }\n            }\n            // 3. Fusionar cada componente.\n            let minStart = Infinity, maxEnd = -Infinity;\n            for (const nodeIndex of componentNodes) {\n                minStart = Math.min(minStart, intervals[nodeIndex][0]);\n                maxEnd = Math.max(maxEnd, intervals[nodeIndex][1]);\n            }\n            result.push([minStart, maxEnd]);\n        }\n    }\n    return result;\n}",
+                "complexity": "Time: O(N^2) [para construir el grafo], Space: O(N^2) [para el grafo]",
+                "example": "Input: [[1,3],[2,6],[8,10],[15,18]]\nOutput: [[1,6],[8,10],[15,18]]"
+            }
+        ]
+    },
+    {
+        "id": "number-of-islands",
+        "title": "200. Number of Islands",
+        "difficulty": "Medium",
+        "description": "Dado una cuadrícula 2D `grid` de `m x n` que representa un mapa de '1's (tierra) y '0's (agua), devuelve el número de islas. Una isla está rodeada de agua y se forma conectando tierras adyacentes horizontal o verticalmente.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Búsqueda en Profundidad (DFS)",
+                "explanation": "Iteramos sobre cada celda de la cuadrícula. Si encontramos una celda con '1' (tierra), incrementamos nuestro contador de islas. Luego, iniciamos una búsqueda en profundidad (DFS) desde esa celda para encontrar todas las partes conectadas de esa isla. Durante el DFS, cambiamos el valor de las celdas de tierra a '0' (o a otro marcador) para asegurarnos de que no las contemos de nuevo.",
+                "code_snippet": "function numIslands(grid) {\n    if (!grid || grid.length === 0) return 0;\n    let count = 0;\n    const rows = grid.length;\n    const cols = grid[0].length;\n\n    function dfs(r, c) {\n        if (r < 0 || c < 0 || r >= rows || c >= cols || grid[r][c] === '0') {\n            return;\n        }\n        grid[r][c] = '0'; // 'Hundir' la tierra visitada\n        dfs(r + 1, c);\n        dfs(r - 1, c);\n        dfs(r, c + 1);\n        dfs(r, c - 1);\n    }\n\n    for (let r = 0; r < rows; r++) {\n        for (let c = 0; c < cols; c++) {\n            if (grid[r][c] === '1') {\n                count++;\n                dfs(r, c);\n            }\n        }\n    }\n    return count;\n}",
+                "complexity": "Time: O(M * N), Space: O(M * N) [en el peor caso, por la pila de recursión]",
+                "example": "Input: [[\"1\",\"1\",\"0\"],[\"1\",\"1\",\"0\"],[\"0\",\"0\",\"1\"]]\nOutput: 2"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Búsqueda en Anchura (BFS)",
+                "explanation": "Similar al DFS, pero utiliza una cola para una búsqueda iterativa por niveles. Cuando encontramos tierra ('1'), incrementamos el contador, añadimos las coordenadas a una cola y la marcamos como visitada ('0'). Luego, mientras la cola no esté vacía, procesamos las celdas, añadiendo a sus vecinos de tierra no visitados a la cola y marcándolos.",
+                "code_snippet": "function numIslands(grid) {\n    if (!grid || grid.length === 0) return 0;\n    let count = 0;\n    const rows = grid.length;\n    const cols = grid[0].length;\n\n    for (let r = 0; r < rows; r++) {\n        for (let c = 0; c < cols; c++) {\n            if (grid[r][c] === '1') {\n                count++;\n                const queue = [[r, c]];\n                grid[r][c] = '0'; // Marcar como visitado\n                while (queue.length > 0) {\n                    const [currR, currC] = queue.shift();\n                    const directions = [[0,1],[0,-1],[1,0],[-1,0]];\n                    for (const [dr, dc] of directions) {\n                        const newR = currR + dr, newC = currC + dc;\n                        if (newR >= 0 && newC >= 0 && newR < rows && newC < cols && grid[newR][newC] === '1') {\n                            queue.push([newR, newC]);\n                            grid[newR][newC] = '0';\n                        }\n                    }\n                }\n            }\n        }\n    }\n    return count;\n}",
+                "complexity": "Time: O(M * N), Space: O(min(M, N)) [por la cola]",
+                "example": "Input: [[\"1\",\"1\",\"0\"],[\"1\",\"1\",\"0\"],[\"0\",\"0\",\"1\"]]\nOutput: 2"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Union-Find (Conjuntos Disjuntos)",
+                "explanation": "Un enfoque avanzado y muy eficiente. Inicialmente, tratamos cada celda de tierra como una isla separada. Luego, iteramos sobre la cuadrícula. Para cada celda de tierra, miramos a sus vecinos (derecha y abajo). Si un vecino también es tierra, unimos los conjuntos a los que pertenecen las dos celdas. El número de operaciones de unión reduce el recuento total de islas. El resultado final es el número de conjuntos disjuntos.",
+                "code_snippet": "// Se requiere una clase UnionFind\nclass UnionFind {\n  /* ... implementación con find, union y count ... */\n}\n\nfunction numIslands(grid) {\n    if (!grid || grid.length === 0) return 0;\n    const rows = grid.length;\n    const cols = grid[0].length;\n    const uf = new UnionFind(grid); // La clase maneja la inicialización\n\n    for (let r = 0; r < rows; r++) {\n        for (let c = 0; c < cols; c++) {\n            if (grid[r][c] === '1') {\n                const p = r * cols + c;\n                // Mirar vecino derecho\n                if (c + 1 < cols && grid[r][c+1] === '1') {\n                    uf.union(p, p + 1);\n                }\n                // Mirar vecino de abajo\n                if (r + 1 < rows && grid[r+1][c] === '1') {\n                    uf.union(p, p + cols);\n                }\n            }\n        }\n    }\n    return uf.getCount();\n}",
+                "complexity": "Time: O(M * N * α(M*N)), donde α es la función Ackermann inversa (casi constante). Space: O(M * N)",
+                "example": "Input: [[\"1\",\"1\",\"0\"],[\"1\",\"1\",\"0\"],[\"0\",\"0\",\"1\"]]\nOutput: 2"
+            }
+        ]
+    },
+    {
+        "id": "lowest-common-ancestor-of-a-bst",
+        "title": "235. Lowest Common Ancestor of a Binary Search Tree",
+        "difficulty": "Easy",
+        "description": "Dado un Árbol de Búsqueda Binario (BST), encuentra el Ancestro Común más Bajo (LCA) de dos nodos dados en el BST. El LCA se define como el nodo más bajo en el árbol que tiene tanto a `p` como a `q` como descendientes.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Recursiva",
+                "explanation": "Este enfoque aprovecha la propiedad del BST. Comenzando desde la raíz, si los valores de `p` y `q` son ambos menores que el valor del nodo actual, el LCA debe estar en el subárbol izquierdo. Si ambos son mayores, debe estar en el derecho. Si los valores se dividen (uno es mayor y otro menor), o si uno de los valores coincide con el nodo actual, entonces el nodo actual es el LCA.",
+                "code_snippet": "function lowestCommonAncestor(root, p, q) {\n    const parentVal = root.val;\n    const pVal = p.val;\n    const qVal = q.val;\n\n    if (pVal > parentVal && qVal > parentVal) {\n        // Ambos están en el subárbol derecho\n        return lowestCommonAncestor(root.right, p, q);\n    } else if (pVal < parentVal && qVal < parentVal) {\n        // Ambos están en el subárbol izquierdo\n        return lowestCommonAncestor(root.left, p, q);\n    } else {\n        // Se han dividido o uno es la raíz, así que este nodo es el LCA\n        return root;\n    }\n}",
+                "complexity": "Time: O(H) [Altura del árbol], Space: O(H) [por la pila de recursión]",
+                "example": "Input: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 8\nOutput: 6"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Iterativa",
+                "explanation": "La misma lógica que la solución recursiva, pero implementada con un bucle `while` para evitar la sobrecarga de la recursión y usar espacio O(1). Comenzamos con un puntero en la raíz y lo movemos hacia la izquierda o hacia la derecha basándonos en si los valores de `p` y `q` son mayores o menores que el valor del nodo del puntero. El bucle se detiene cuando encontramos el nodo de división, que es el LCA.",
+                "code_snippet": "function lowestCommonAncestor(root, p, q) {\n    let node = root;\n    const pVal = p.val;\n    const qVal = q.val;\n\n    while (node) {\n        const parentVal = node.val;\n        if (pVal > parentVal && qVal > parentVal) {\n            node = node.right;\n        } else if (pVal < parentVal && qVal < parentVal) {\n            node = node.left;\n        } else {\n            return node;\n        }\n    }\n    return null;\n}",
+                "complexity": "Time: O(H), Space: O(1)",
+                "example": "Input: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 4\nOutput: 2"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Encontrando Caminos",
+                "explanation": "Este es un enfoque más general que funcionaría para cualquier árbol binario, no solo BSTs. Primero, encontramos el camino desde la raíz hasta el nodo `p` y lo almacenamos. Luego, encontramos el camino desde la raíz hasta el nodo `q`. Finalmente, comparamos los dos caminos. El último nodo que tienen en común es el LCA. Este método es menos eficiente para un BST ya que no utiliza sus propiedades.",
+                "code_snippet": "function lowestCommonAncestor(root, p, q) {\n    const getPath = (node, target) => {\n        const path = [];\n        while (node.val !== target.val) {\n            path.push(node);\n            if (target.val < node.val) {\n                node = node.left;\n            } else {\n                node = node.right;\n            }\n        }\n        path.push(node);\n        return path;\n    };\n\n    const pathP = getPath(root, p);\n    const pathQ = getPath(root, q);\n\n    let lca = null;\n    for (let i = 0; i < Math.min(pathP.length, pathQ.length); i++) {\n        if (pathP[i] === pathQ[i]) {\n            lca = pathP[i];\n        } else {\n            break;\n        }\n    }\n    return lca;\n}",
+                "complexity": "Time: O(H), Space: O(H)",
+                "example": "Input: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 4\nOutput: 2"
+            }
+        ]
+    },
+    {
+        "id": "coin-change",
+        "title": "322. Coin Change",
+        "difficulty": "Medium",
+        "description": "Se te da un array de enteros `coins` que representan monedas de diferentes denominaciones y un entero `amount` que representa una cantidad total de dinero. Devuelve el menor número de monedas que necesitas para formar esa cantidad. Si esa cantidad no se puede formar con ninguna combinación de monedas, devuelve -1.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Programación Dinámica (Bottom-Up)",
+                "explanation": "Este es el enfoque clásico de DP. Creamos un array `dp` de tamaño `amount + 1`, donde `dp[i]` almacenará el número mínimo de monedas para la cantidad `i`. Lo inicializamos con un valor grande (infinito). `dp[0]` es 0. Luego, iteramos desde 1 hasta `amount`. Para cada cantidad `i`, probamos cada moneda `c`. Si `i >= c`, entonces `dp[i] = min(dp[i], 1 + dp[i - c])`.",
+                "code_snippet": "function coinChange(coins, amount) {\n    const dp = new Array(amount + 1).fill(Infinity);\n    dp[0] = 0;\n\n    for (let i = 1; i <= amount; i++) {\n        for (const coin of coins) {\n            if (i - coin >= 0) {\n                dp[i] = Math.min(dp[i], 1 + dp[i - coin]);\n            }\n        }\n    }\n\n    return dp[amount] === Infinity ? -1 : dp[amount];\n}",
+                "complexity": "Time: O(Amount * N), donde N es el número de monedas. Space: O(Amount)",
+                "example": "Input: coins = [1, 2, 5], amount = 11\nOutput: 3 (5 + 5 + 1)"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Programación Dinámica (Top-Down con Memoización)",
+                "explanation": "Este es el enfoque recursivo optimizado. Definimos una función recursiva que calcula la cantidad mínima de monedas para una cantidad dada. Para evitar volver a calcular los mismos subproblemas, usamos un array o mapa de memoización (`memo`) para almacenar los resultados. Si `memo[amount]` ya está calculado, lo devolvemos directamente.",
+                "code_snippet": "function coinChange(coins, amount) {\n    const memo = new Map();\n\n    function findMinCoins(rem) {\n        if (rem < 0) return Infinity;\n        if (rem === 0) return 0;\n        if (memo.has(rem)) return memo.get(rem);\n\n        let minCount = Infinity;\n        for (const coin of coins) {\n            const res = findMinCoins(rem - coin);\n            if (res !== Infinity) {\n                minCount = Math.min(minCount, 1 + res);\n            }\n        }\n\n        memo.set(rem, minCount);\n        return minCount;\n    }\n\n    const result = findMinCoins(amount);\n    return result === Infinity ? -1 : result;\n}",
+                "complexity": "Time: O(Amount * N), Space: O(Amount)",
+                "example": "Input: coins = [2], amount = 3\nOutput: -1"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Búsqueda en Anchura (BFS)",
+                "explanation": "Podemos ver este problema como la búsqueda del camino más corto en un grafo no ponderado. Cada cantidad de 0 a `amount` es un nodo. Hay una arista de `u` a `v` si `v = u + c` para alguna moneda `c`. Queremos encontrar el camino más corto desde el nodo 0 al nodo `amount`. El BFS es perfecto para esto. El nivel en el que encontramos `amount` por primera vez es la respuesta.",
+                "code_snippet": "function coinChange(coins, amount) {\n    if (amount === 0) return 0;\n\n    const queue = [0];\n    const visited = new Set([0]);\n    let level = 0;\n\n    while (queue.length > 0) {\n        level++;\n        const levelSize = queue.length;\n        for (let i = 0; i < levelSize; i++) {\n            const currentAmount = queue.shift();\n            for (const coin of coins) {\n                const nextAmount = currentAmount + coin;\n                if (nextAmount === amount) return level;\n                if (nextAmount < amount && !visited.has(nextAmount)) {\n                    visited.add(nextAmount);\n                    queue.push(nextAmount);\n                }\n            }\n        }\n    }\n\n    return -1;\n}",
+                "complexity": "Time: O(Amount * N), Space: O(Amount)",
+                "example": "Input: coins = [1, 2, 5], amount = 11\nOutput: 3"
+            }
+        ]
+    },
+    {
+        "id": "path-sum",
+        "title": "112. Path Sum",
+        "difficulty": "Easy",
+        "description": "Dado el `root` de un árbol binario y un entero `targetSum`, devuelve `true` si el árbol tiene una ruta de la raíz a la hoja tal que la suma de todos los valores a lo largo de la ruta sea igual a `targetSum`. Una hoja es un nodo sin hijos.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Recursión (DFS)",
+                "explanation": "La forma más intuitiva de resolver este problema. Creamos una función recursiva que viaja por el árbol. En cada nodo, restamos su valor de la suma objetivo. El caso base es cuando llegamos a un nodo hoja (sin hijos izquierdo ni derecho). En ese punto, comprobamos si la suma restante es igual al valor de la hoja. Si no es una hoja, llamamos recursivamente a sus hijos con la suma actualizada.",
+                "code_snippet": "function hasPathSum(root, targetSum) {\n    if (!root) return false;\n\n    // Si es un nodo hoja\n    if (!root.left && !root.right) {\n        return targetSum === root.val;\n    }\n\n    // Llamadas recursivas para los subárboles\n    const remainingSum = targetSum - root.val;\n    return hasPathSum(root.left, remainingSum) || hasPathSum(root.right, remainingSum);\n}",
+                "complexity": "Time: O(N), Space: O(H) [Altura del árbol]",
+                "example": "Input: root = [5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum = 22\nOutput: true (5->4->11->2)"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Iterativa con Pila (DFS)",
+                "explanation": "Podemos simular la recursión DFS usando una pila explícita. La pila almacenará pares `[nodo, suma_actual]`. Empezamos empujando la raíz y su valor. En cada iteración, sacamos un nodo y su suma. Si es una hoja y la suma coincide con `targetSum`, devolvemos `true`. De lo contrario, empujamos a sus hijos (si existen) a la pila con la suma actualizada.",
+                "code_snippet": "function hasPathSum(root, targetSum) {\n    if (!root) return false;\n\n    const stack = [[root, root.val]];\n\n    while (stack.length > 0) {\n        const [node, currentSum] = stack.pop();\n\n        if (!node.left && !node.right && currentSum === targetSum) {\n            return true;\n        }\n\n        if (node.right) {\n            stack.push([node.right, currentSum + node.right.val]);\n        }\n        if (node.left) {\n            stack.push([node.left, currentSum + node.left.val]);\n        }\n    }\n    return false;\n}",
+                "complexity": "Time: O(N), Space: O(H)",
+                "example": "Input: root = [1,2,3], targetSum = 5\nOutput: false"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Iterativa con Cola (BFS)",
+                "explanation": "Similar al enfoque iterativo DFS, pero usando una cola para un recorrido por niveles (BFS). La lógica es idéntica: la cola almacena pares `[nodo, suma_actual]`. Procesamos los nodos nivel por nivel. Este enfoque también encuentra una ruta válida, aunque no necesariamente la misma que encontraría DFS primero.",
+                "code_snippet": "function hasPathSum(root, targetSum) {\n    if (!root) return false;\n\n    const queue = [[root, root.val]];\n\n    while (queue.length > 0) {\n        const [node, currentSum] = queue.shift();\n\n        if (!node.left && !node.right && currentSum === targetSum) {\n            return true;\n        }\n\n        if (node.left) {\n            queue.push([node.left, currentSum + node.left.val]);\n        }\n        if (node.right) {\n            queue.push([node.right, currentSum + node.right.val]);\n        }\n    }\n    return false;\n}",
+                "complexity": "Time: O(N), Space: O(W) [Ancho máximo del árbol]",
+                "example": "Input: root = [], targetSum = 0\nOutput: false"
+            }
+        ]
+    },
+    {
+        "id": "same-tree",
+        "title": "100. Same Tree",
+        "difficulty": "Easy",
+        "description": "Dadas las raíces de dos árboles binarios, `p` y `q`, escribe una función para comprobar si son iguales. Dos árboles binarios se consideran iguales si son estructuralmente idénticos y los nodos tienen el mismo valor.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Recursiva",
+                "explanation": "El enfoque más simple y elegante. Comparamos los dos nodos actuales. Los casos base son: 1) Si ambos son nulos, son iguales. 2) Si uno es nulo pero el otro no, o si sus valores son diferentes, no son iguales. Si pasan estas comprobaciones, el resultado depende de si sus subárboles izquierdo y derecho son iguales, lo que verificamos con llamadas recursivas.",
+                "code_snippet": "function isSameTree(p, q) {\n    // Si ambos son nulos, son iguales.\n    if (!p && !q) return true;\n    // Si uno es nulo o los valores no coinciden, no son iguales.\n    if (!p || !q || p.val !== q.val) return false;\n\n    // Comprobar recursivamente los subárboles.\n    return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);\n}",
+                "complexity": "Time: O(N), Space: O(H) [Altura del árbol]",
+                "example": "Input: p = [1,2,3], q = [1,2,3]\nOutput: true"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Iterativa con Cola (BFS)",
+                "explanation": "Utilizamos una cola para comparar los árboles nivel por nivel. Añadimos ambas raíces a la cola. Mientras la cola no esté vacía, sacamos dos nodos (`nodeP`, `nodeQ`) y los comparamos. Si son iguales, añadimos sus hijos a la cola en el mismo orden (`p.left` con `q.left`, `p.right` con `q.right`) para la siguiente ronda de comparaciones.",
+                "code_snippet": "function isSameTree(p, q) {\n    const queue = [p, q];\n\n    while (queue.length > 0) {\n        const nodeP = queue.shift();\n        const nodeQ = queue.shift();\n\n        if (!nodeP && !nodeQ) continue;\n        if (!nodeP || !nodeQ || nodeP.val !== nodeQ.val) return false;\n\n        queue.push(nodeP.left);\n        queue.push(nodeQ.left);\n        queue.push(nodeP.right);\n        queue.push(nodeQ.right);\n    }\n    return true;\n}",
+                "complexity": "Time: O(N), Space: O(W) [Ancho máximo del árbol]",
+                "example": "Input: p = [1,2], q = [1,null,2]\nOutput: false"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Iterativa con Pila (DFS)",
+                "explanation": "Similar a la solución con cola, pero utilizando una pila para un recorrido en profundidad. La lógica es la misma: la pila almacena pares de nodos a comparar. Sacamos dos nodos, los validamos, y si son válidos, empujamos a sus hijos a la pila para ser comparados más tarde.",
+                "code_snippet": "function isSameTree(p, q) {\n    const stack = [p, q];\n\n    while (stack.length > 0) {\n        const nodeQ = stack.pop();\n        const nodeP = stack.pop();\n\n        if (!nodeP && !nodeQ) continue;\n        if (!nodeP || !nodeQ || nodeP.val !== nodeQ.val) return false;\n\n        stack.push(nodeP.left);\n        stack.push(nodeQ.left);\n        stack.push(nodeP.right);\n        stack.push(nodeQ.right);\n    }\n    return true;\n}",
+                "complexity": "Time: O(N), Space: O(H)",
+                "example": "Input: p = [1,2,1], q = [1,1,2]\nOutput: false"
+            }
+        ]
+    },
+    {
+        "id": "plus-one",
+        "title": "066. Plus One",
+        "difficulty": "Easy",
+        "description": "Se te da un array de dígitos que representa un gran entero. Los dígitos se ordenan del más al menos significativo. Incrementa el gran entero en uno y devuelve el array de dígitos resultante.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Iteración desde el Final (Clásica)",
+                "explanation": "Recorremos el array de dígitos de derecha a izquierda. Si un dígito es menor que 9, simplemente lo incrementamos y devolvemos el array. Si es 9, lo cambiamos a 0 y continuamos con el 'acarreo' (carry) a la siguiente posición. Si todo el array son nueves (ej. [9,9]), el bucle terminará y tendremos que añadir un 1 al principio del array.",
+                "code_snippet": "function plusOne(digits) {\n    for (let i = digits.length - 1; i >= 0; i--) {\n        if (digits[i] < 9) {\n            digits[i]++;\n            return digits;\n        }\n        digits[i] = 0;\n    }\n    // Si salimos del bucle, significa que todos los dígitos eran 9\n    digits.unshift(1);\n    return digits;\n}",
+                "complexity": "Time: O(N), Space: O(1) [O(N) en el peor caso por unshift]",
+                "example": "Input: digits = [4,3,2,1]\nOutput: [4,3,2,2]"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Conversión a BigInt",
+                "explanation": "Un enfoque directo que aprovecha las capacidades del lenguaje. Convertimos el array de dígitos a una cadena, luego a un `BigInt` (para manejar números muy grandes), le sumamos 1, lo convertimos de nuevo a una cadena y finalmente dividimos la cadena en un array de dígitos numéricos. Es simple pero puede ser menos eficiente para arrays extremadamente grandes.",
+                "code_snippet": "function plusOne(digits) {\n    const numAsString = digits.join('');\n    const bigNum = BigInt(numAsString);\n    const resultNum = bigNum + 1n;\n    return resultNum.toString().split('').map(Number);\n}",
+                "complexity": "Time: O(N), Space: O(N)",
+                "example": "Input: digits = [9,9,9]\nOutput: [1,0,0,0]"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Recursiva",
+                "explanation": "Podemos usar la recursión para manejar el acarreo. Una función auxiliar toma un índice. Intenta sumar uno en esa posición. Si el dígito se convierte en 10, lo establece en 0 y hace una llamada recursiva para el índice anterior (`index - 1`). El caso base es cuando un dígito no necesita acarreo o cuando el acarreo sale del inicio del array.",
+                "code_snippet": "function plusOne(digits) {\n    function add(index) {\n        if (index < 0) {\n            digits.unshift(1);\n            return;\n        }\n        digits[index]++;\n        if (digits[index] === 10) {\n            digits[index] = 0;\n            add(index - 1);\n        }\n    }\n    add(digits.length - 1);\n    return digits;\n}",
+                "complexity": "Time: O(N), Space: O(N) [por la pila de recursión]",
+                "example": "Input: digits = [1,2,3]\nOutput: [1,2,4]"
+            }
+        ]
+    },
+    {
+        "id": "sqrt-x",
+        "title": "069. Sqrt(x)",
+        "difficulty": "Easy",
+        "description": "Dado un entero no negativo `x`, calcula y devuelve la raíz cuadrada de `x`. Como el tipo de retorno es un entero, la parte decimal se trunca. No puedes usar funciones de exponente integradas.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Búsqueda Binaria",
+                "explanation": "La solución más eficiente y estándar. Sabemos que la raíz cuadrada de `x` debe estar en el rango de `[0, x]`. Podemos aplicar búsqueda binaria en este rango. Para cada valor `mid`, comprobamos si `mid * mid` es igual, mayor o menor que `x`. Ajustamos nuestro rango de búsqueda (`left`, `right`) en consecuencia hasta que encontremos el mayor entero cuya raíz cuadrada sea menor o igual a `x`.",
+                "code_snippet": "function mySqrt(x) {\n    if (x < 2) return x;\n    let left = 1, right = x, ans = 0;\n\n    while (left <= right) {\n        let mid = Math.floor(left + (right - left) / 2);\n        // Usar división para evitar desbordamiento con mid*mid\n        if (mid <= x / mid) {\n            ans = mid; // Este es un candidato válido\n            left = mid + 1; // Intentar encontrar uno más grande\n        } else {\n            right = mid - 1;\n        }\n    }\n    return ans;\n}",
+                "complexity": "Time: O(log N), Space: O(1)",
+                "example": "Input: 8\nOutput: 2"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Método de Newton",
+                "explanation": "Un método numérico clásico para encontrar raíces. Para encontrar `sqrt(x)`, buscamos la raíz de la función `f(r) = r^2 - x`. La fórmula de iteración es `r_nuevo = (r_viejo + x / r_viejo) / 2`. Comenzamos con una suposición inicial (ej. `x`) y aplicamos la fórmula repetidamente hasta que el valor converja. La convergencia es muy rápida.",
+                "code_snippet": "function mySqrt(x) {\n    if (x === 0) return 0;\n    let r = x;\n    while (r * r > x) {\n        r = Math.floor((r + x / r) / 2);\n    }\n    return r;\n}",
+                "complexity": "Time: O(log N) [la convergencia es cuadrática], Space: O(1)",
+                "example": "Input: 4\nOutput: 2"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Fuerza Bruta",
+                "explanation": "La solución más simple pero ineficiente. Iteramos con un número `i` desde 0 hacia arriba. En cada paso, comprobamos si `i * i` es mayor que `x`. Tan pronto como lo sea, sabemos que el `i` anterior fue la respuesta entera correcta. Este enfoque es demasiado lento para números grandes.",
+                "code_snippet": "function mySqrt(x) {\n    if (x < 2) return x;\n    for (let i = 1; i <= x; i++) {\n        if (i * i > x) {\n            return i - 1;\n        }\n        if (i * i === x) {\n            return i;\n        }\n    }\n}",
+                "complexity": "Time: O(sqrt(N)), Space: O(1)",
+                "example": "Input: 9\nOutput: 3"
+            }
+        ]
+    },
+    {
+        "id": "length-of-last-word",
+        "title": "058. Length of Last Word",
+        "difficulty": "Easy",
+        "description": "Dada una cadena `s` que consiste en palabras y espacios, devuelve la longitud de la última palabra en la cadena. Una palabra es una subcadena máxima que consiste solo en caracteres que no son espacios.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Usando Métodos de String",
+                "explanation": "La forma más idiomática en lenguajes de alto nivel. Primero, usamos `.trim()` para eliminar cualquier espacio en blanco al principio o al final. Luego, usamos `.split(' ')` para dividir la cadena en un array de palabras. La última palabra es el último elemento del array, y simplemente devolvemos su longitud.",
+                "code_snippet": "function lengthOfLastWord(s) {\n    const words = s.trim().split(' ');\n    return words[words.length - 1].length;\n}",
+                "complexity": "Time: O(N), Space: O(N) [para el array de palabras]",
+                "example": "Input: s = \"Hello World\"\nOutput: 5"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Búsqueda desde el Final (Óptima)",
+                "explanation": "Este enfoque es más eficiente en espacio. Iteramos la cadena desde el final. Primero, usamos un bucle para saltar cualquier espacio en blanco final. Una vez que encontramos el primer carácter que no es un espacio, comenzamos a contar hasta que encontramos otro espacio o llegamos al principio de la cadena. Este conteo es la longitud de la última palabra.",
+                "code_snippet": "function lengthOfLastWord(s) {\n    let length = 0;\n    let i = s.length - 1;\n\n    // Saltar espacios finales\n    while (i >= 0 && s[i] === ' ') {\n        i--;\n    }\n\n    // Contar la última palabra\n    while (i >= 0 && s[i] !== ' ') {\n        length++;\n        i--;\n    }\n    return length;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: s = \"   fly me   to   the moon  \"\nOutput: 4"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Usando `lastIndexOf`",
+                "explanation": "Otra forma de usar métodos de string integrados. Primero, usamos `.trim()` para limpiar la cadena. Luego, encontramos el índice del último espacio con `lastIndexOf(' ')`. La longitud de la última palabra es la longitud total de la cadena recortada menos la posición del último espacio menos 1.",
+                "code_snippet": "function lengthOfLastWord(s) {\n    const trimmed = s.trim();\n    const lastSpaceIndex = trimmed.lastIndexOf(' ');\n    return trimmed.length - lastSpaceIndex - 1;\n}",
+                "complexity": "Time: O(N), Space: O(N) [por la nueva cadena de trim]",
+                "example": "Input: s = \"luffy is still joyboy\"\nOutput: 6"
+            }
+        ]
+    },
+    {
+        "id": "intersection-of-two-linked-lists",
+        "title": "160. Intersection of Two Linked Lists",
+        "difficulty": "Easy",
+        "description": "Dadas las cabezas de dos listas enlazadas simples, `headA` y `headB`, devuelve el nodo en el que las dos listas se cruzan. Si las dos listas no se cruzan, devuelve `null`.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Two Pointers (Óptima)",
+                "explanation": "La solución más ingeniosa y eficiente. Usamos dos punteros, `pA` y `pB`, que comienzan en `headA` y `headB`. Ambos recorren sus listas. Cuando uno llega al final, salta a la cabeza de la *otra* lista. De esta manera, ambos punteros recorren la misma distancia total (`lenA + lenB`). Si hay una intersección, se encontrarán en el nodo de intersección. Si no, se encontrarán en `null` al final.",
+                "code_snippet": "function getIntersectionNode(headA, headB) {\n    if (!headA || !headB) return null;\n\n    let pA = headA;\n    let pB = headB;\n\n    while (pA !== pB) {\n        pA = (pA === null) ? headB : pA.next;\n        pB = (pB === null) ? headA : pB.next;\n    }\n    return pA; // O pB, serán el mismo nodo o null\n}",
+                "complexity": "Time: O(M + N), Space: O(1)",
+                "example": "Input: listA = [4,1,8,4,5], listB = [5,6,1,8,4,5], intersectVal = 8\nOutput: Nodo con valor 8"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Hash Set",
+                "explanation": "Un enfoque intuitivo que utiliza espacio extra. Primero, recorremos una de las listas (por ejemplo, `listA`) y almacenamos cada nodo visitado en un `Set`. Luego, recorremos la segunda lista (`listB`). Para cada nodo de `listB`, comprobamos si ya existe en el `Set`. El primer nodo que encontremos en el `Set` es el punto de intersección.",
+                "code_snippet": "function getIntersectionNode(headA, headB) {\n    const visited = new Set();\n\n    let current = headA;\n    while (current) {\n        visited.add(current);\n        current = current.next;\n    }\n\n    current = headB;\n    while (current) {\n        if (visited.has(current)) {\n            return current;\n        }\n        current = current.next;\n    }\n\n    return null;\n}",
+                "complexity": "Time: O(M + N), Space: O(M) o O(N)",
+                "example": "Input: listA = [1,9,1,2,4], listB = [3,2,4], intersectVal = 2\nOutput: Nodo con valor 2"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Fuerza Bruta",
+                "explanation": "La solución más simple conceptualmente pero la menos eficiente. Por cada nodo en la `listA`, recorremos la `listB` completa desde su cabeza para ver si algún nodo coincide. Si encontramos una coincidencia de referencias de nodo, hemos encontrado la intersección. Este enfoque tiene una complejidad cuadrática.",
+                "code_snippet": "function getIntersectionNode(headA, headB) {\n    let pA = headA;\n    while (pA) {\n        let pB = headB;\n        while (pB) {\n            if (pA === pB) {\n                return pA;\n            }\n            pB = pB.next;\n        }\n        pA = pA.next;\n    }\n    return null;\n}",
+                "complexity": "Time: O(M * N), Space: O(1)",
+                "example": "Input: listA = [2,6,4], listB = [1,5], intersectVal = 0\nOutput: null"
+            }
+        ]
+    },
+    {
+        "id": "excel-sheet-column-number",
+        "title": "171. Excel Sheet Column Number",
+        "difficulty": "Easy",
+        "description": "Dada una cadena `columnTitle` que representa el título de una columna como aparece en una hoja de Excel, devuelve su número de columna correspondiente. Por ejemplo, `A -> 1`, `B -> 2`, `Z -> 26`, `AA -> 27`, `AB -> 28`.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Iteración de Izquierda a Derecha",
+                "explanation": "Este problema es equivalente a convertir un número en base 26 a base 10. Iteramos a través de la cadena de izquierda a derecha. En cada paso, multiplicamos el resultado acumulado por 26 y le sumamos el valor del carácter actual. El valor de un carácter se calcula como `(su código ASCII - código ASCII de 'A' + 1)`.",
+                "code_snippet": "function titleToNumber(columnTitle) {\n    let result = 0;\n    const base = 'A'.charCodeAt(0) - 1;\n\n    for (const char of columnTitle) {\n        result = result * 26 + (char.charCodeAt(0) - base);\n    }\n    return result;\n}",
+                "complexity": "Time: O(N), donde N es la longitud del título. Space: O(1)",
+                "example": "Input: \"AB\"\nOutput: 28"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Iteración de Derecha a Izquierda",
+                "explanation": "Este enfoque imita más de cerca cómo calculamos manualmente los valores en un sistema de bases. Iteramos desde el final de la cadena hacia el principio. Mantenemos una variable `powerOf26` que comienza en 1. En cada paso, calculamos el valor del carácter, lo multiplicamos por `powerOf26` y lo sumamos al resultado. Luego, multiplicamos `powerOf26` por 26 para la siguiente iteración.",
+                "code_snippet": "function titleToNumber(columnTitle) {\n    let result = 0;\n    let powerOf26 = 1;\n    const base = 'A'.charCodeAt(0) - 1;\n\n    for (let i = columnTitle.length - 1; i >= 0; i--) {\n        const charVal = columnTitle.charCodeAt(i) - base;\n        result += charVal * powerOf26;\n        powerOf26 *= 26;\n    }\n    return result;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: \"ZY\"\nOutput: 701"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Funcional con `reduce`",
+                "explanation": "Una forma más concisa y funcional de escribir la lógica de izquierda a derecha en JavaScript. Convertimos la cadena en un array de caracteres y usamos el método `reduce`. El acumulador (`acc`) representa el resultado hasta el momento, que se multiplica por 26 en cada paso antes de sumar el valor del carácter actual.",
+                "code_snippet": "function titleToNumber(columnTitle) {\n    const base = 'A'.charCodeAt(0) - 1;\n    return columnTitle.split('').reduce((acc, char) => {\n        return acc * 26 + (char.charCodeAt(0) - base);\n    }, 0);\n}",
+                "complexity": "Time: O(N), Space: O(N) [por el array intermedio de split]",
+                "example": "Input: \"A\"\nOutput: 1"
+            }
+        ]
+    },
+    {
+        "id": "pascals-triangle",
+        "title": "118. Pascal's Triangle",
+        "difficulty": "Easy",
+        "description": "Dado un entero `numRows`, genera las primeras `numRows` del Triángulo de Pascal. En el Triángulo de Pascal, cada número es la suma de los dos números directamente encima de él.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Simulación Iterativa",
+                "explanation": "Este es el enfoque más directo. Construimos el triángulo fila por fila. Empezamos con la primera fila `[1]`. Luego, en un bucle, generamos cada nueva fila basándonos en la fila anterior. Cada elemento de la nueva fila (excepto los extremos, que siempre son 1) es la suma de los dos elementos correspondientes de la fila anterior.",
+                "code_snippet": "function generate(numRows) {\n    if (numRows === 0) return [];\n    const triangle = [[1]];\n\n    for (let i = 1; i < numRows; i++) {\n        const prevRow = triangle[i - 1];\n        const newRow = [1];\n        for (let j = 1; j < prevRow.length; j++) {\n            newRow.push(prevRow[j - 1] + prevRow[j]);\n        }\n        newRow.push(1);\n        triangle.push(newRow);\n    }\n    return triangle;\n}",
+                "complexity": "Time: O(numRows^2), Space: O(numRows^2)",
+                "example": "Input: numRows = 5\nOutput: [[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Usando la Fórmula Matemática",
+                "explanation": "Cada elemento en el Triángulo de Pascal en la fila `n` y columna `k` es `C(n, k)`, el coeficiente binomial. Podemos calcular cada elemento de una fila a partir del anterior. El primer elemento de una fila es `C(n, 0) = 1`. El siguiente es `C(n, 1) = C(n, 0) * (n - 0) / 1`. En general, `C(n, k) = C(n, k-1) * (n - k + 1) / k`. Esto evita recalcular todo desde la fila anterior.",
+                "code_snippet": "function generate(numRows) {\n    const triangle = [];\n    for (let i = 0; i < numRows; i++) {\n        const row = [1];\n        let current = 1;\n        for (let j = 1; j <= i; j++) {\n            current = current * (i - j + 1) / j;\n            row.push(current);\n        }\n        triangle.push(row);\n    }\n    return triangle;\n}",
+                "complexity": "Time: O(numRows^2), Space: O(numRows^2)",
+                "example": "Input: numRows = 3\nOutput: [[1],[1,1],[1,2,1]]"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Recursiva",
+                "explanation": "Podemos definir el problema de forma recursiva. Para generar `n` filas, primero generamos `n-1` filas recursivamente, y luego construimos la `n`-ésima fila a partir de la última fila obtenida en la llamada recursiva. El caso base es cuando `numRows` es 1. Aunque es conceptualmente válido, es menos eficiente que el enfoque iterativo.",
+                "code_snippet": "function generate(numRows) {\n    if (numRows === 1) return [[1]];\n    if (numRows === 0) return [];\n\n    const prevTriangle = generate(numRows - 1);\n    const prevRow = prevTriangle[prevTriangle.length - 1];\n    const newRow = [1];\n\n    for (let j = 1; j < prevRow.length; j++) {\n        newRow.push(prevRow[j - 1] + prevRow[j]);\n    }\n    newRow.push(1);\n\n    prevTriangle.push(newRow);\n    return prevTriangle;\n}",
+                "complexity": "Time: O(numRows^2), Space: O(numRows^2)",
+                "example": "Input: numRows = 1\nOutput: [[1]]"
+            }
+        ]
+    },
+    {
+        "id": "convert-sorted-array-to-binary-search-tree",
+        "title": "108. Convert Sorted Array to Binary Search Tree",
+        "difficulty": "Easy",
+        "description": "Dado un array de enteros `nums` donde los elementos están ordenados en orden ascendente, conviértelo en un Árbol de Búsqueda Binario (BST) de altura balanceada.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Recursión (Pre-order Traversal)",
+                "explanation": "La solución óptima y más natural. Para asegurar que el árbol esté balanceado, el elemento del medio del array debe ser la raíz del árbol. El subarray a la izquierda del medio formará el subárbol izquierdo, y el subarray a la derecha formará el subárbol derecho. Aplicamos esta lógica recursivamente a los subarrays.",
+                "code_snippet": "function sortedArrayToBST(nums) {\n    if (!nums.length) return null;\n\n    function build(left, right) {\n        if (left > right) return null;\n\n        const mid = Math.floor(left + (right - left) / 2);\n        const node = new TreeNode(nums[mid]);\n        \n        node.left = build(left, mid - 1);\n        node.right = build(mid + 1, right);\n        \n        return node;\n    }\n\n    return build(0, nums.length - 1);\n}",
+                "complexity": "Time: O(N), Space: O(log N) [por la pila de recursión]",
+                "example": "Input: nums = [-10,-3,0,5,9]\nOutput: [0,-3,9,-10,null,5]"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Iterativa con Pila",
+                "explanation": "Podemos simular la recursión de forma iterativa usando una pila. La pila almacenará tuplas de `[nodo, límite_izquierdo, límite_derecho]`. Empezamos con la raíz y los límites del array completo. En cada paso, sacamos un elemento, calculamos el medio, asignamos el valor y luego empujamos los subproblemas izquierdo y derecho a la pila para su posterior procesamiento.",
+                "code_snippet": "function sortedArrayToBST(nums) {\n    if (!nums.length) return null;\n\n    const root = new TreeNode();\n    const stack = [[root, 0, nums.length - 1]];\n\n    while (stack.length > 0) {\n        const [node, left, right] = stack.pop();\n        const mid = Math.floor(left + (right - left) / 2);\n        node.val = nums[mid];\n\n        if (left <= mid - 1) {\n            node.left = new TreeNode();\n            stack.push([node.left, left, mid - 1]);\n        }\n        if (mid + 1 <= right) {\n            node.right = new TreeNode();\n            stack.push([node.right, mid + 1, right]);\n        }\n    }\n    return root;\n}",
+                "complexity": "Time: O(N), Space: O(N) [en el peor caso]",
+                "example": "Input: nums = [1,3]\nOutput: [3,1] o [1,null,3]"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Usando `slice` (Menos Eficiente)",
+                "explanation": "Una variación de la solución recursiva que es más fácil de leer pero menos eficiente debido al uso de `slice`. En lugar de pasar índices, creamos nuevos subarrays para las llamadas recursivas. `slice` tiene un costo de O(K) donde K es el tamaño de la rebanada, lo que hace que la complejidad total del tiempo sea mayor.",
+                "code_snippet": "function sortedArrayToBST(nums) {\n    if (!nums.length) return null;\n\n    const mid = Math.floor(nums.length / 2);\n    const root = new TreeNode(nums[mid]);\n\n    // slice crea nuevos arrays en cada llamada\n    root.left = sortedArrayToBST(nums.slice(0, mid));\n    root.right = sortedArrayToBST(nums.slice(mid + 1));\n\n    return root;\n}",
+                "complexity": "Time: O(N log N) [debido a slice], Space: O(N) [por los nuevos arrays]",
+                "example": "Input: nums = [-10,-3,0,5,9]\nOutput: [0,-3,9,-10,null,5]"
+            }
+        ]
+    },
+    {
+        "id": "search-insert-position",
+        "title": "035. Search Insert Position",
+        "difficulty": "Easy",
+        "description": "Dado un array ordenado de enteros distintos y un valor objetivo, devuelve el índice si se encuentra el objetivo. Si no, devuelve el índice donde estaría si se insertara en orden.",
+        "solutions": [
+            {
+                "id": 1,
+                "title": "Solución 1: Búsqueda Binaria",
+                "explanation": "El enfoque óptimo. Utilizamos búsqueda binaria para encontrar el objetivo. Si lo encontramos, devolvemos su índice. Si el bucle termina sin encontrar el objetivo (`left > right`), el puntero `left` apuntará exactamente a la posición donde el objetivo debería insertarse para mantener el orden. Por lo tanto, simplemente devolvemos `left`.",
+                "code_snippet": "function searchInsert(nums, target) {\n    let left = 0;\n    let right = nums.length - 1;\n\n    while (left <= right) {\n        let mid = Math.floor(left + (right - left) / 2);\n        if (nums[mid] === target) {\n            return mid;\n        } else if (nums[mid] < target) {\n            left = mid + 1;\n        } else {\n            right = mid - 1;\n        }\n    }\n    // Si no se encuentra, 'left' es la posición de inserción.\n    return left;\n}",
+                "complexity": "Time: O(log N), Space: O(1)",
+                "example": "Input: nums = [1,3,5,6], target = 5\nOutput: 2"
+            },
+            {
+                "id": 2,
+                "title": "Solución 2: Búsqueda Lineal",
+                "explanation": "La solución de fuerza bruta. Recorremos el array desde el principio. Buscamos el primer elemento que sea igual o mayor que el objetivo. El índice de ese elemento es la respuesta. Si recorremos todo el array y todos los elementos son menores que el objetivo, la posición de inserción es al final del array (`nums.length`).",
+                "code_snippet": "function searchInsert(nums, target) {\n    for (let i = 0; i < nums.length; i++) {\n        if (nums[i] >= target) {\n            return i;\n        }\n    }\n    return nums.length;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: nums = [1,3,5,6], target = 2\nOutput: 1"
+            },
+            {
+                "id": 3,
+                "title": "Solución 3: Usando `findIndex`",
+                "explanation": "Un enfoque funcional y conciso en JavaScript. El método `findIndex` devuelve el índice del primer elemento que satisface una condición. Buscamos el primer elemento que sea mayor o igual que el `target`. Si se encuentra, `findIndex` devuelve su índice. Si no se encuentra ningún elemento así (lo que significa que el `target` debe ir al final), `findIndex` devuelve -1. En ese caso, devolvemos la longitud del array.",
+                "code_snippet": "function searchInsert(nums, target) {\n    const index = nums.findIndex(num => num >= target);\n    return index === -1 ? nums.length : index;\n}",
+                "complexity": "Time: O(N), Space: O(1)",
+                "example": "Input: nums = [1,3,5,6], target = 7\nOutput: 4"
+            }
+        ]
     }
 ]
