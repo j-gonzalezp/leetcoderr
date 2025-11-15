@@ -27,15 +27,52 @@ function SolutionView({ solution }: { solution: Solution }) {
                 </p>
             )}
             <h4 style={{ marginTop: '15px', marginBottom: '5px' }}>Ejemplo:</h4>
-            <pre style={{
-                backgroundColor: '#f9f9f9',
-                padding: '10px',
-                border: '1px solid #ccc',
-                fontFamily: 'monospace',
-                fontSize: '14px'
-            }}>
-                {solution.example}
-            </pre>
+            {typeof solution.example === 'string' ? (
+                <pre style={{
+                    backgroundColor: '#f9f9f9',
+                    padding: '10px',
+                    border: '1px solid #ccc',
+                    fontFamily: 'monospace',
+                    fontSize: '14px'
+                }}>
+                    {solution.example}
+                </pre>
+            ) : (
+                <div style={{
+                    backgroundColor: '#f9f9f9',
+                    padding: '15px',
+                    border: '1px solid #ccc',
+                    fontFamily: 'monospace',
+                    fontSize: '14px'
+                }}>
+                    <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>
+                        Input: {solution.example.input}
+                    </div>
+                    {solution.example.steps && solution.example.steps.length > 0 && (
+                        <div style={{ marginBottom: '10px' }}>
+                            <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>Pasos:</div>
+                            {solution.example.steps.map((step, idx) => (
+                                <div key={idx} style={{ marginLeft: '15px', marginBottom: '8px', padding: '8px', backgroundColor: '#fff', border: '1px solid #ddd', borderRadius: '4px' }}>
+                                    <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                                        Iteración {step.iteration}: {step.description}
+                                    </div>
+                                    {step.code_line && (
+                                        <div style={{ marginTop: '4px', color: '#666', fontSize: '12px' }}>
+                                            {step.code_line}
+                                        </div>
+                                    )}
+                                    <div style={{ marginTop: '4px', color: '#0066cc', fontWeight: 'bold' }}>
+                                        {step.output}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    <div style={{ marginTop: '10px', fontWeight: 'bold', color: '#006600' }}>
+                        Output: {solution.example.final_output}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
